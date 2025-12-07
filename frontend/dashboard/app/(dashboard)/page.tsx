@@ -74,8 +74,10 @@ const viewerUsers = [
 
 const adEngagement = [
   {
-    adName: "Holiday Splash",
+    adName: "ad_xk8v2p9m",
     videoId: "vid_4f9a",
+    show: "The Office",
+    poster: "https://m.media-amazon.com/images/M/MV5BMDNkOTE4NDQtMTNmYi00MWE0LWE4MTgtYzU3MjgxYzM5ZjViXkEyXkFqcGdeQXVyMzQ2MDI5NjU@._V1_SX300.jpg",
     score: 86,
     metrics: [
       { label: "View Rate", value: 84 },
@@ -84,8 +86,10 @@ const adEngagement = [
     ],
   },
   {
-    adName: "Launch Teaser",
+    adName: "ad_j3n7q5wr",
     videoId: "vid_b21c",
+    show: "Breaking Bad",
+    poster: "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg",
     score: 74,
     metrics: [
       { label: "View Rate", value: 71 },
@@ -94,8 +98,10 @@ const adEngagement = [
     ],
   },
   {
-    adName: "Retention Loop",
+    adName: "ad_f2m4t8zl",
     videoId: "vid_d7f2",
+    show: "Friends",
+    poster: "https://m.media-amazon.com/images/M/MV5BNDVkYjU0MzctMWRmZi00NTkxLTgwZWEtOWVhYjZlYjllYmU4XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_SX300.jpg",
     score: 42,
     metrics: [
       { label: "View Rate", value: 38 },
@@ -120,18 +126,18 @@ import { TargetingForm } from "@/components/onboarding/targeting-form"
 import { toast } from "sonner"
 
 const placements_data = [
-  { id: 1, title: "Breaking Bad", network: "AMC", viewers: "2.4M", category: "Drama" },
-  { id: 2, title: "Stranger Things", network: "Netflix", viewers: "14.2M", category: "Sci-Fi" },
-  { id: 3, title: "The Office", network: "Peacock", viewers: "8.1M", category: "Comedy" },
-  { id: 4, title: "Game of Thrones", network: "HBO", viewers: "9.3M", category: "Fantasy" },
-  { id: 5, title: "Succession", network: "HBO", viewers: "3.5M", category: "Drama" },
+  { id: 1, title: "Suits", network: "USA Network", viewers: "4.2M", category: "Drama", poster: "https://m.media-amazon.com/images/M/MV5BNmVmMmM5ZmItZDg0OC00NTFiLWIxNzctZjNmYTY5OTU3ZWU3XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg" },
+  { id: 2, title: "Friends", network: "NBC", viewers: "25.0M", category: "Comedy", poster: "https://m.media-amazon.com/images/M/MV5BNDVkYjU0MzctMWRmZi00NTkxLTgwZWEtOWVhYjZlYjllYmU4XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_SX300.jpg" },
+  { id: 3, title: "The Office", network: "NBC", viewers: "8.1M", category: "Comedy", poster: "https://m.media-amazon.com/images/M/MV5BMDNkOTE4NDQtMTNmYi00MWE0LWE4MTgtYzU3MjgxYzM5ZjViXkEyXkFqcGdeQXVyMzQ2MDI5NjU@._V1_SX300.jpg" },
+  { id: 4, title: "Breaking Bad", network: "AMC", viewers: "2.4M", category: "Drama", poster: "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg" },
+  { id: 5, title: "Game of Thrones", network: "HBO", viewers: "9.3M", category: "Fantasy", poster: "https://m.media-amazon.com/images/M/MV5BN2IzYzBiOTQtNGZmMi00NDI5LTgxMzMtN2EzZjA1NjhlOGMxXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_SX300.jpg" },
 ]
 
 const availableShows = [
-  { id: 6, title: "The Bear", network: "Hulu", viewers: "4.1M", category: "Drama" },
-  { id: 7, title: "Ted Lasso", network: "Apple TV+", viewers: "5.2M", category: "Comedy" },
-  { id: 8, title: "House of the Dragon", network: "HBO", viewers: "10.1M", category: "Fantasy" },
-  { id: 9, title: "The Mandalorian", network: "Disney+", viewers: "7.8M", category: "Sci-Fi" },
+  { id: 6, title: "SpongeBob SquarePants", network: "Nickelodeon", viewers: "2.1M", category: "Animation", poster: "https://m.media-amazon.com/images/M/MV5BNTk2OTYyMjkzN15BMl5BanBnXkFtZTgwOTQzNDQxMTE@._V1_SX300.jpg" },
+  { id: 7, title: "South Park", network: "Comedy Central", viewers: "1.8M", category: "Animation", poster: "https://m.media-amazon.com/images/M/MV5BZjNkN2I3NWMtNzRlZi00NDFlLWFkNDgtNGM4MDViNjM2YzBkXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg" },
+  { id: 8, title: "Stranger Things", network: "Netflix", viewers: "14.2M", category: "Sci-Fi", poster: "https://m.media-amazon.com/images/M/MV5BMDZkYmVhNjMtNWU4MC00MDQxLWE3MjYtZGMzZWI1ZjhlOWJmXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg" },
+  { id: 9, title: "The Simpsons", network: "FOX", viewers: "3.5M", category: "Animation", poster: "https://m.media-amazon.com/images/M/MV5BYjFkMTlkYWUtZWFhNy00M2FmLThiOTYtYTRiYjVlZWYxNmJkXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg" },
 ]
 
 export default function DashboardPage() {
@@ -253,8 +259,8 @@ export default function DashboardPage() {
               <AreaChart data={conversionData}>
                 <defs>
                   <linearGradient id="colorConversions" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ffffff" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#ffffff" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#1d9bf0" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#1d9bf0" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
@@ -276,7 +282,7 @@ export default function DashboardPage() {
                 <Area 
                   type="monotone" 
                   dataKey="conversions" 
-                  stroke="#ffffff" 
+                  stroke="#1d9bf0" 
                   strokeWidth={2}
                   fill="url(#colorConversions)" 
                 />
@@ -300,8 +306,8 @@ export default function DashboardPage() {
               <AreaChart data={adClicksData}>
                 <defs>
                   <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ffffff" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#ffffff" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#1d9bf0" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#1d9bf0" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
@@ -323,7 +329,7 @@ export default function DashboardPage() {
                 <Area 
                   type="monotone" 
                   dataKey="clicks" 
-                  stroke="#ffffff" 
+                  stroke="#1d9bf0" 
                   strokeWidth={2}
                   fill="url(#colorClicks)" 
                 />
@@ -366,7 +372,7 @@ export default function DashboardPage() {
                 />
                 <Bar 
                   dataKey="spend" 
-                  fill="#ffffff" 
+                  fill="#1d9bf0" 
                   fillOpacity={0.6}
                   radius={[8, 8, 0, 0]} 
                 />
@@ -407,9 +413,9 @@ export default function DashboardPage() {
                 <Line 
                   type="monotone" 
                   dataKey="ctr" 
-                  stroke="#ffffff" 
+                  stroke="#1d9bf0" 
                   strokeWidth={3}
-                  dot={{ fill: "#ffffff", r: 4 }}
+                  dot={{ fill: "#1d9bf0", r: 4 }}
                 />
               </LineChart>
             </ChartContainer>
@@ -514,8 +520,8 @@ export default function DashboardPage() {
                         setShowUserDropdown(false)
                         setUserSearchQuery("")
                       }}
-                      className={`w-full text-left px-6 py-4 border-b border-white/10 last:border-b-0 hover:bg-neutral-700 transition-colors ${
-                        selectedUser.email === user.email ? 'bg-neutral-700' : ''
+                      className={`w-full text-left px-6 py-4 border-b border-white/10 last:border-b-0 hover:bg-black transition-colors ${
+                        selectedUser.email === user.email ? 'bg-black' : ''
                       }`}
                     >
                       <div className="font-medium text-white text-sm">{user.name}</div>
@@ -543,9 +549,16 @@ export default function DashboardPage() {
                   
                   {/* Thumbnail (Main Content) */}
                   <div className="relative flex-1 bg-black">
-                     {/* Aspect Ratio spacer */}
-                    <div className="pt-[56.25%]" />
-                    <div className="absolute inset-0 flex flex-col justify-between p-3">
+                     {/* Aspect Ratio spacer - portrait format matching posters */}
+                    <div className="pt-[150%]" />
+                    {ad.poster && (
+                      <img 
+                        src={ad.poster} 
+                        alt={ad.show}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/60 flex flex-col justify-between p-3">
                         <div className="flex justify-between items-start">
                             <div className="bg-black/60  px-1.5 py-0.5 rounded text-[10px] text-white/80 font-mono">
                                 {ad.videoId}
@@ -601,15 +614,21 @@ export default function DashboardPage() {
               </div>
             ))}
             
-            {/* Random 2-3 additional ads per user */}
-            {Array.from({ length: Math.floor(Math.random() * 2) + 2 }).map((_, i) => {
-              const randomAd = adEngagement[Math.floor(Math.random() * adEngagement.length)]
+            {/* Additional variant ads */}
+            {adEngagement.slice(0, 2).map((randomAd, i) => {
               return (
                <div key={`additional-random-${i}`} className="flex flex-col group opacity-70 hover:opacity-100 transition-all w-full md:w-[calc(50%-0.5rem)] xl:w-[calc(33.333%-0.67rem)] 2xl:w-[calc(25%-0.75rem)]">
                 <div className="glass-card flex overflow-hidden  transition-all border-0">
                   <div className="relative flex-1 bg-black">
-                    <div className="pt-[56.25%]" />
-                    <div className="absolute inset-0 flex flex-col justify-between p-3">
+                    <div className="pt-[150%]" />
+                    {randomAd.poster && (
+                      <img 
+                        src={randomAd.poster} 
+                        alt={randomAd.show}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/60 flex flex-col justify-between p-3">
                         <div className="flex justify-between items-start">
                             <div className="bg-black/60  px-1.5 py-0.5 rounded text-[10px] text-white/80 font-mono">
                                 {randomAd.videoId}_var{i}
@@ -622,7 +641,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="mt-auto">
                            <h3 className="text-white font-medium text-sm leading-tight line-clamp-2 drop-shadow-md">
-                             {randomAd.adName} (Variant {i + 1})
+                             {randomAd.adName}_v{i + 1}
                            </h3>
                         </div>
                     </div>
@@ -630,8 +649,8 @@ export default function DashboardPage() {
                   <div className="w-40 bg-black border-l border-white/10 flex flex-col p-4 pt-3 flex-shrink-0">
                     <div className="text-left mb-3 pb-2 border-b border-white/5 flex-shrink-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-3xl font-bold text-white tracking-tight">{Math.floor(Math.random() * 30) + 40}</span>
-                        {Math.floor(Math.random() * 30) + 40 >= 50 ? (
+                        <span className="text-3xl font-bold text-white tracking-tight">{randomAd.score - 10 - (i * 5)}</span>
+                        {randomAd.score - 10 - (i * 5) >= 50 ? (
                           <ArrowUp className="h-5 w-5 text-white/60" strokeWidth={3} />
                         ) : (
                           <ArrowDown className="h-5 w-5 text-white/60" strokeWidth={3} />
@@ -679,8 +698,15 @@ export default function DashboardPage() {
           {placements.map((show) => (
             <div key={show.id} className="group">
               <div className="glass-card relative overflow-hidden  transition-all p-0">
-                <div className="aspect-video bg-black relative">
-                  <div className="absolute inset-0 flex items-end p-4">
+                <div className="relative bg-black" style={{ paddingTop: '150%' }}>
+                  {show.poster && (
+                    <img 
+                      src={show.poster} 
+                      alt={show.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex items-end p-4">
                     <div>
                       <h3 className="text-white font-medium text-sm leading-tight line-clamp-1 drop-shadow-lg">{show.title}</h3>
                       <p className="text-white/50 text-xs drop-shadow-lg">{show.network}</p>
@@ -700,8 +726,10 @@ export default function DashboardPage() {
           {/* Add New Button */}
           <div className="group cursor-pointer" onClick={() => setIsAddOpen(true)}>
             <div className="glass-card relative overflow-hidden  hover: transition-all p-0">
-              <div className="aspect-video bg-black flex items-center justify-center relative">
-                <Plus className="h-12 w-12 text-white drop-shadow-lg" strokeWidth={2.5} />
+              <div className="relative bg-black flex items-center justify-center" style={{ paddingTop: '150%' }}>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Plus className="h-12 w-12 text-white drop-shadow-lg" strokeWidth={0} />
+                </div>
               </div>
             </div>
           </div>
@@ -716,7 +744,7 @@ export default function DashboardPage() {
               </DialogHeader>
               <div className="grid gap-4 py-4 max-h-[400px] overflow-y-auto">
                 {availableShows.map((show) => (
-                  <div key={show.id} className="flex items-center justify-between p-3  border border-white/10 bg-neutral-800 hover:bg-neutral-700 transition-colors">
+                  <div key={show.id} className="flex items-center justify-between p-3  border border-white/10 bg-black hover:bg-black transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-16 rounded bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-[8px] text-white/30 font-mono">
                         16:9
@@ -730,7 +758,7 @@ export default function DashboardPage() {
                       type="button"
                       size="sm" 
                       variant="secondary"
-                      className="bg-neutral-800 text-white hover:bg-neutral-700 h-8"
+                      className="bg-black text-white hover:bg-black h-8"
                       onClick={() => {
                         setPlacements([...placements, show])
                         setIsAddOpen(false)

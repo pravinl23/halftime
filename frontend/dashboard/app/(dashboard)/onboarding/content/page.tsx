@@ -11,18 +11,15 @@ import { Button } from "@/components/ui/button"
 import { X, Search, Tv, ChevronDown } from "lucide-react"
 
 const POPULAR_SHOWS = [
-  { id: 1, name: "Breaking Bad", network: "AMC", genre: "Drama" },
-  { id: 2, name: "The Office", network: "NBC", genre: "Comedy" },
-  { id: 3, name: "Stranger Things", network: "Netflix", genre: "Sci-Fi" },
-  { id: 4, name: "Game of Thrones", network: "HBO", genre: "Fantasy" },
-  { id: 5, name: "Friends", network: "NBC", genre: "Comedy" },
-  { id: 6, name: "The Crown", network: "Netflix", genre: "Drama" },
-  { id: 7, name: "South Park", network: "Comedy Central", genre: "Animation" },
-  { id: 8, name: "The Simpsons", network: "FOX", genre: "Animation" },
-  { id: 9, name: "Succession", network: "HBO", genre: "Drama" },
-  { id: 10, name: "The Mandalorian", network: "Disney+", genre: "Sci-Fi" },
-  { id: 11, name: "Planet Earth", network: "BBC", genre: "Documentary" },
-  { id: 12, name: "The Last of Us", network: "HBO", genre: "Drama" },
+  { id: 1, name: "Suits", network: "USA Network", genre: "Drama" },
+  { id: 2, name: "SpongeBob SquarePants", network: "Nickelodeon", genre: "Animation" },
+  { id: 3, name: "Friends", network: "NBC", genre: "Comedy" },
+  { id: 4, name: "South Park", network: "Comedy Central", genre: "Animation" },
+  { id: 5, name: "The Office", network: "NBC", genre: "Comedy" },
+  { id: 6, name: "Breaking Bad", network: "AMC", genre: "Drama" },
+  { id: 7, name: "Game of Thrones", network: "HBO", genre: "Fantasy" },
+  { id: 8, name: "Stranger Things", network: "Netflix", genre: "Sci-Fi" },
+  { id: 9, name: "The Simpsons", network: "FOX", genre: "Animation" },
 ]
 
 export default function ContentSelectionPage() {
@@ -139,7 +136,7 @@ export default function ContentSelectionPage() {
               type="button"
               onClick={() => setShowDropdown(!showDropdown)}
               disabled={isLoading}
-              className="w-full h-12 px-4 bg-neutral-800 border border-white/20 text-white text-left flex items-center justify-between hover:bg-neutral-700 transition-all"
+              className="w-full h-12 px-4 bg-black border border-white/20 text-white text-left flex items-center justify-between hover:bg-black transition-all"
             >
               <span className={excludedShows.length === 0 ? "text-white/40" : ""}>
                 {excludedShows.length === 0 ? "Select shows to exclude..." : `${excludedShows.length} shows excluded`}
@@ -147,12 +144,12 @@ export default function ContentSelectionPage() {
               <ChevronDown className="h-4 w-4 text-white/60" />
             </button>
             {showDropdown && (
-              <div className="absolute z-50 w-full mt-2 bg-neutral-800 border border-white/30  overflow-hidden max-h-64 overflow-y-auto">
+              <div className="absolute z-50 w-full mt-2 bg-black border border-white/30  overflow-hidden max-h-64 overflow-y-auto">
                 {filteredShows.map((show) => (
                   <div
                     key={show.id}
                     onClick={() => handleToggleShow(show)}
-                    className="px-4 py-3 cursor-pointer hover:bg-neutral-700 transition-colors flex items-center gap-3 border-b border-white/10 last:border-b-0"
+                    className="px-4 py-3 cursor-pointer hover:bg-black transition-colors flex items-center gap-3 border-b border-white/10 last:border-b-0"
                   >
                     <div className={`w-4 h-4 rounded border ${excludedShows.some(s => s.id === show.id) ? 'bg-white border-white' : 'border-white/40'}`} />
                     <div className="flex-1">
@@ -212,13 +209,13 @@ export default function ContentSelectionPage() {
                 }
               }}
               placeholder="e.g., violence, explicit, horror..."
-              className="h-11 bg-neutral-800 border-white/20 text-white placeholder:text-white/50  text-base px-4 focus:bg-neutral-700 focus:border-white/30"
+              className="h-11 bg-black border-white/20 text-white placeholder:text-white/50  text-base px-4 focus:bg-black focus:border-white/30"
             />
             <Button
               type="button"
               onClick={handleAddKeyword}
               disabled={!keywordInput.trim()}
-              className="h-11  bg-neutral-800 border border-white/20 text-white font-medium hover:bg-neutral-700 px-6"
+              className="h-11  bg-black border border-white/20 text-white font-medium hover:bg-black px-6"
             >
               Add
             </Button>

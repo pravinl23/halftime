@@ -168,7 +168,7 @@ export function SignupForm() {
             <Link href="/login">
               <Button
                 type="button"
-                className="w-full h-12  bg-neutral-800 border border-white/20 text-white font-medium text-[15px] hover:bg-neutral-700 transition-all duration-200"
+                className="w-full h-12  bg-black border border-white/20 text-white font-medium text-[15px] hover:bg-black transition-all duration-200"
               >
                 Sign in
               </Button>

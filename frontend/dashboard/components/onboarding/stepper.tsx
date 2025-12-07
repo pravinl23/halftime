@@ -16,8 +16,8 @@ export function Stepper({ currentStep, steps }: StepperProps) {
                 className={`
                   w-12 h-12  flex items-center justify-center font-bold text-sm transition-all
                   ${index < currentStep ? 'bg-white text-black border border-white/50' : ''}
-                  ${index === currentStep ? 'bg-neutral-700 text-white border border-white/40 ring-4 ring-white/20' : ''}
-                  ${index > currentStep ? 'bg-neutral-800 text-white/60 border border-white/30' : ''}
+                  ${index === currentStep ? 'bg-black text-white border border-white/40 ring-4 ring-white/20' : ''}
+                  ${index > currentStep ? 'bg-black text-white/60 border border-white/30' : ''}
                 `}
               >
                 {index + 1}

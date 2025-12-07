@@ -71,7 +71,7 @@ export function CompanySearch({ onSelect }: CompanySearchProps) {
             {results.map((company, index) => (
               <div
                 key={index}
-                className="p-4 cursor-pointer hover:bg-neutral-700 transition-colors border-b border-white/10 last:border-b-0"
+                className="p-4 cursor-pointer hover:bg-black transition-colors border-b border-white/10 last:border-b-0"
                 onClick={() => {
                   onSelect(company)
                   setResults([])

@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Toaster } from "@/components/ui/sonner"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AnimatedBackground } from "@/components/layout/animated-background"
 
 export default async function DashboardLayout({
   children,
@@ -49,8 +48,7 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full bg-gradient-to-t from-black to-neutral-900 relative overflow-hidden">
-        <AnimatedBackground />
+      <div className="flex h-screen w-full bg-black relative overflow-hidden">
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden relative z-10">
           <main className="flex-1 overflow-y-auto">

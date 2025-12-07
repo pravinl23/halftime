@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation"
 import { Stepper } from "@/components/onboarding/stepper"
 import { Toaster } from "@/components/ui/sonner"
-import { AnimatedBackground } from "@/components/layout/animated-background"
 
 const steps = ["Organization", "Audience", "Content"]
 
@@ -22,8 +21,7 @@ export default function OnboardingLayout({
     : 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-t from-black to-neutral-900 text-white p-6 relative overflow-hidden">
-      <AnimatedBackground />
+    <div className="min-h-screen bg-black text-white p-6 relative overflow-hidden">
       <div className="w-full max-w-4xl mx-auto relative z-10">
         <div className="mb-6">
           <h1 className="text-white text-[48px] font-bold tracking-tight flex items-center gap-3">

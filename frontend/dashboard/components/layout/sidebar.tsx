@@ -48,7 +48,7 @@ export function Sidebar() {
   }
 
   return (
-    <ShadcnSidebar className="bg-black relative z-10 border-r border-white/10">
+    <ShadcnSidebar className="bg-black relative z-10 border-r border-white/10" style={{ borderRadius: 0 }}>
       <SidebarHeader className="border-b border-white/10 p-6 bg-black">
         <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
           <img src="/logo.png" alt="HalfTime Logo" className="h-[20px] w-auto" />

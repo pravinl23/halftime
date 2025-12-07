@@ -149,7 +149,7 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
                   <div
                     key={range.label}
                     onClick={() => handleAgeRangeToggle(range.value)}
-                    className="px-4 py-3 cursor-pointer bg-neutral-800 hover:bg-neutral-700 transition-colors flex items-center gap-3 border-b border-white/20 last:border-b-0"
+                    className="px-4 py-3 cursor-pointer bg-black hover:bg-black transition-colors flex items-center gap-3 border-b border-white/20 last:border-b-0"
                   >
                     <div className={`w-4 h-4 rounded ${ageRanges.some(r => r.min === range.value.min && r.max === range.value.max) ? 'bg-white border-2 border-white' : 'bg-transparent border-2 border-white'}`} />
                     <span className="text-white text-sm font-medium">{range.label}</span>
@@ -181,7 +181,7 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
                   <div
                     key={gender}
                     onClick={() => handleGenderToggle(gender)}
-                    className="px-4 py-3 cursor-pointer bg-neutral-800 hover:bg-neutral-700 transition-colors flex items-center gap-3 border-b border-white/20 last:border-b-0"
+                    className="px-4 py-3 cursor-pointer bg-black hover:bg-black transition-colors flex items-center gap-3 border-b border-white/20 last:border-b-0"
                   >
                     <div className={`w-4 h-4 rounded ${genders.includes(gender) ? 'bg-white border-2 border-white' : 'bg-transparent border-2 border-white'}`} />
                     <span className="text-white text-sm font-medium">{gender}</span>
@@ -230,7 +230,7 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
                   <div
                     key={genre}
                     onClick={() => handleGenreToggle(genre)}
-                    className="px-4 py-3 cursor-pointer bg-neutral-800 hover:bg-neutral-700 transition-colors flex items-center gap-3 border-b border-white/20 last:border-b-0"
+                    className="px-4 py-3 cursor-pointer bg-black hover:bg-black transition-colors flex items-center gap-3 border-b border-white/20 last:border-b-0"
                   >
                     <div className={`w-4 h-4 rounded ${contentGenres.includes(genre) ? 'bg-white border-2 border-white' : 'bg-transparent border-2 border-white'}`} />
                     <span className="text-white text-sm font-medium">{genre}</span>
