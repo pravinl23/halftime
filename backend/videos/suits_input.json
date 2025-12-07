@@ -1,0 +1,20 @@
+{
+  "subtitle_path": "../../data/suits.srt",
+  "video_path": "../../data/suits.mp4",
+  "user_data": {
+    "interests": ["business", "law", "drama", "fashion", "luxury"],
+    "demographics": {
+      "age_group": "25-45",
+      "location": "US"
+    }
+  },
+  "product": {
+    "company": "Coca-Cola",
+    "product": "Coca-Cola can",
+    "category": "beverage"
+  },
+  "content_type": "TV Show",
+  "content_genre": "Legal Drama",
+  "buffer_seconds": 10
+}
+
