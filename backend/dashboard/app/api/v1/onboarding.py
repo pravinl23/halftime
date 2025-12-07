@@ -25,8 +25,8 @@ class TargetingProfileData(BaseModel):
     exclusions: Optional[dict] = None
 
 class ContentPreferencesData(BaseModel):
-    selected_shows: Optional[List[dict]] = None
-    content_restrictions: Optional[List[str]] = None
+    excluded_shows: Optional[List[dict]] = None
+    excluded_keywords: Optional[List[str]] = None
 
 
 @router.get("/known-companies/search")
@@ -130,14 +130,14 @@ async def save_content_preferences(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Save content preferences (shows and restrictions).
+    Save content exclusions (shows and keywords to exclude).
     Temporarily mocked to avoid Supabase key issues.
     """
     # TODO: Reconnect to Supabase once API keys are stable.
-    # This would update the targeting_profile with selected_shows and content_restrictions
+    # This would update the targeting_profile with excluded_shows and excluded_keywords
     return {
         "success": True,
-        "message": "Content preferences saved",
-        "selected_shows": content_data.selected_shows,
-        "content_restrictions": content_data.content_restrictions,
+        "message": "Content exclusions saved",
+        "excluded_shows": content_data.excluded_shows,
+        "excluded_keywords": content_data.excluded_keywords,
     }

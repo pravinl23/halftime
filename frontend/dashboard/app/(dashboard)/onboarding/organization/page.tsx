@@ -78,23 +78,23 @@ export default function OrganizationPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <div className="backdrop-blur-2xl bg-black/40 border border-white/10 rounded-3xl p-10 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)]">
-        <h2 className="text-white text-[31px] font-bold mb-2 text-center">Select Your Organization</h2>
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div className="glass-card p-8 min-h-[450px]">
+        <h2 className="text-white text-[28px] font-bold mb-2 text-center tracking-tight">Select Your Organization</h2>
         <p className="text-white/60 mb-6 text-center text-[15px]">
           Search for your company to automatically load brand assets, or create a custom organization.
         </p>
         
         <CompanySearch onSelect={handleCompanySelect} />
-      </div>
-      
-      <div className="text-center relative z-10">
-        <button
-          onClick={() => setShowCustomForm(!showCustomForm)}
-          className="text-sm text-[#1d9bf0] hover:underline font-medium"
-        >
-          {showCustomForm ? "Hide" : "Can't find your company? Create custom organization"}
-        </button>
+        
+        <div className="text-center mt-6 pt-6 border-t border-white/20">
+          <button
+            onClick={() => setShowCustomForm(!showCustomForm)}
+            className="text-sm text-white hover:text-white/80 hover:underline font-medium transition-colors"
+          >
+            {showCustomForm ? "Hide custom form" : "Can't find your company? Create custom organization"}
+          </button>
+        </div>
       </div>
       
       {showCustomForm && (

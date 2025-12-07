@@ -3,6 +3,8 @@ import { headers } from "next/headers"
 import { createClient } from "@/lib/supabase/server"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Toaster } from "@/components/ui/sonner"
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AnimatedBackground } from "@/components/layout/animated-background"
 
 export default async function DashboardLayout({
   children,
@@ -22,17 +24,18 @@ export default async function DashboardLayout({
   }
 
   // Check onboarding status (skip check if already on onboarding pages)
-  if (!pathname.startsWith("/onboarding")) {
-    const { data: org } = await supabase
-      .from("organizations")
-      .select("onboarding_completed")
-      .eq("user_id", user.id)
-      .single()
-    
-    if (org && !org.onboarding_completed) {
-      redirect("/onboarding/organization")
-    }
-  }
+  // TODO: Re-enable once Supabase backend is stable
+  // if (!pathname.startsWith("/onboarding")) {
+  //   const { data: org } = await supabase
+  //     .from("organizations")
+  //     .select("onboarding_completed")
+  //     .eq("user_id", user.id)
+  //     .single()
+  //   
+  //   if (org && !org.onboarding_completed) {
+  //     redirect("/onboarding/organization")
+  //   }
+  // }
 
   // Don't show sidebar on onboarding pages
   if (pathname.startsWith("/onboarding")) {
@@ -45,15 +48,20 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto p-8">
-          {children}
+    <SidebarProvider>
+      <div className="flex h-screen w-full bg-gradient-to-t from-black to-neutral-900 relative overflow-hidden">
+        <AnimatedBackground />
+        <Sidebar />
+        <div className="flex flex-1 flex-col overflow-hidden relative z-10">
+          <main className="flex-1 overflow-y-auto">
+            <div className="h-full w-full px-4 py-4 lg:px-6 lg:py-6">
+              {children}
+            </div>
+          </main>
         </div>
-      </main>
-      <Toaster />
-    </div>
+        <Toaster />
+      </div>
+    </SidebarProvider>
   )
 }
 

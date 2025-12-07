@@ -43,9 +43,9 @@ export default function PreferencesPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="backdrop-blur-2xl bg-black/40 border border-white/10 rounded-3xl p-10 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)]">
-        <h2 className="text-white text-[31px] font-bold mb-2 text-center">Define Your Target Audience</h2>
-        <p className="text-white/60 mb-8 text-center text-[15px]">
+      <div className="glass-card p-8">
+        <h2 className="text-white text-[28px] font-bold mb-2 text-center tracking-tight">Define Your Target Audience</h2>
+        <p className="text-white/60 mb-6 text-center text-[15px]">
           Tell us about the customers you want to reach with your campaigns.
         </p>
         

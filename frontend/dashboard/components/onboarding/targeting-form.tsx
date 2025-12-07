@@ -133,7 +133,7 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
               type="button"
               onClick={() => setShowAgeDropdown(!showAgeDropdown)}
               disabled={isLoading}
-              className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white text-left flex items-center justify-between hover:bg-white/10 transition-all"
+              className="glass-card w-full h-12 px-4 text-white text-left flex items-center justify-between hover:opacity-90 transition-all border-0"
             >
               <span className={ageRanges.length === 0 ? "text-white/40" : ""}>
                 {ageRanges.length === 0 
@@ -144,15 +144,15 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
               <ChevronDown className="h-4 w-4 text-white/60" />
             </button>
             {showAgeDropdown && (
-              <div className="absolute z-50 w-full mt-2 bg-[#16181c] border border-white/20 rounded-xl overflow-hidden shadow-2xl">
+              <div className="absolute z-50 w-full mt-2  overflow-hidden shadow-lg">
                 {AGE_RANGES.map((range) => (
                   <div
                     key={range.label}
                     onClick={() => handleAgeRangeToggle(range.value)}
-                    className="px-4 py-3 cursor-pointer hover:bg-white/10 transition-colors flex items-center gap-3"
+                    className="px-4 py-3 cursor-pointer bg-neutral-800 hover:bg-neutral-700 transition-colors flex items-center gap-3 border-b border-white/20 last:border-b-0"
                   >
-                    <div className={`w-4 h-4 rounded border ${ageRanges.some(r => r.min === range.value.min && r.max === range.value.max) ? 'bg-[#1d9bf0] border-[#1d9bf0]' : 'border-white/40'}`} />
-                    <span className="text-white text-sm">{range.label}</span>
+                    <div className={`w-4 h-4 rounded ${ageRanges.some(r => r.min === range.value.min && r.max === range.value.max) ? 'bg-white border-2 border-white' : 'bg-transparent border-2 border-white'}`} />
+                    <span className="text-white text-sm font-medium">{range.label}</span>
                   </div>
                 ))}
               </div>
@@ -168,7 +168,7 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
               type="button"
               onClick={() => setShowGenderDropdown(!showGenderDropdown)}
               disabled={isLoading}
-              className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white text-left flex items-center justify-between hover:bg-white/10 transition-all"
+              className="glass-card w-full h-12 px-4 text-white text-left flex items-center justify-between hover:opacity-90 transition-all border-0"
             >
               <span className={genders.length === 0 ? "text-white/40" : ""}>
                 {genders.length === 0 ? "Select genders..." : genders.join(", ")}
@@ -176,15 +176,15 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
               <ChevronDown className="h-4 w-4 text-white/60" />
             </button>
             {showGenderDropdown && (
-              <div className="absolute z-50 w-full mt-2 bg-[#16181c] border border-white/20 rounded-xl overflow-hidden shadow-2xl">
+              <div className="absolute z-50 w-full mt-2  overflow-hidden shadow-lg">
                 {GENDERS.map((gender) => (
                   <div
                     key={gender}
                     onClick={() => handleGenderToggle(gender)}
-                    className="px-4 py-3 cursor-pointer hover:bg-white/10 transition-colors flex items-center gap-3"
+                    className="px-4 py-3 cursor-pointer bg-neutral-800 hover:bg-neutral-700 transition-colors flex items-center gap-3 border-b border-white/20 last:border-b-0"
                   >
-                    <div className={`w-4 h-4 rounded border ${genders.includes(gender) ? 'bg-[#1d9bf0] border-[#1d9bf0]' : 'border-white/40'}`} />
-                    <span className="text-white text-sm">{gender}</span>
+                    <div className={`w-4 h-4 rounded ${genders.includes(gender) ? 'bg-white border-2 border-white' : 'bg-transparent border-2 border-white'}`} />
+                    <span className="text-white text-sm font-medium">{gender}</span>
                   </div>
                 ))}
               </div>
@@ -205,7 +205,7 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
             onChange={(e) => setLocation(e.target.value)}
             placeholder="e.g., United States, New York, California..."
             disabled={isLoading}
-            className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl text-base px-4 backdrop-blur-md focus:bg-white/10 focus:border-white/20 transition-all"
+            className="glass-card h-12 text-white placeholder:text-white/50 text-base px-4 hover:opacity-90 focus:opacity-90 transition-all border-0"
           />
         </div>
 
@@ -217,7 +217,7 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
               type="button"
               onClick={() => setShowGenreDropdown(!showGenreDropdown)}
               disabled={isLoading}
-              className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white text-left flex items-center justify-between hover:bg-white/10 transition-all"
+              className="glass-card w-full h-12 px-4 text-white text-left flex items-center justify-between hover:opacity-90 transition-all border-0"
             >
               <span className={contentGenres.length === 0 ? "text-white/40" : ""}>
                 {contentGenres.length === 0 ? "Select genres..." : `${contentGenres.length} genres selected`}
@@ -225,15 +225,15 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
               <ChevronDown className="h-4 w-4 text-white/60" />
             </button>
             {showGenreDropdown && (
-              <div className="absolute z-50 w-full mt-2 bg-[#16181c] border border-white/20 rounded-xl overflow-hidden shadow-2xl max-h-64 overflow-y-auto">
+              <div className="absolute z-50 w-full mt-2  overflow-hidden max-h-64 overflow-y-auto shadow-lg">
                 {CONTENT_GENRES.map((genre) => (
                   <div
                     key={genre}
                     onClick={() => handleGenreToggle(genre)}
-                    className="px-4 py-3 cursor-pointer hover:bg-white/10 transition-colors flex items-center gap-3"
+                    className="px-4 py-3 cursor-pointer bg-neutral-800 hover:bg-neutral-700 transition-colors flex items-center gap-3 border-b border-white/20 last:border-b-0"
                   >
-                    <div className={`w-4 h-4 rounded border ${contentGenres.includes(genre) ? 'bg-[#1d9bf0] border-[#1d9bf0]' : 'border-white/40'}`} />
-                    <span className="text-white text-sm">{genre}</span>
+                    <div className={`w-4 h-4 rounded ${contentGenres.includes(genre) ? 'bg-white border-2 border-white' : 'bg-transparent border-2 border-white'}`} />
+                    <span className="text-white text-sm font-medium">{genre}</span>
                   </div>
                 ))}
               </div>
@@ -276,13 +276,13 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
             }}
             placeholder="e.g., sneakers, basketball, fitness..."
             disabled={isLoading}
-            className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl text-base px-4 backdrop-blur-md focus:bg-white/10 focus:border-white/20 transition-all"
+            className="glass-card h-12 text-white placeholder:text-white/50 text-base px-4 hover:opacity-90 focus:opacity-90 transition-all border-0"
           />
           <Button
             type="button"
             onClick={handleAddInterest}
             disabled={!interestInput.trim() || isLoading}
-            className="h-12 rounded-xl bg-white text-black font-bold hover:bg-white/90 px-6"
+            className="h-12  bg-white text-black font-medium hover:bg-white/90 px-6"
           >
             Add
           </Button>
@@ -308,7 +308,7 @@ export function TargetingForm({ onSubmit, isLoading }: TargetingFormProps) {
 
       <Button
         type="submit"
-        className="w-full h-12 rounded-full bg-[#1d9bf0] text-white font-bold text-[16px] hover:bg-[#1a8cd8] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg"
+        className="glass-card w-full h-12  text-white font-medium text-[16px] hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 border-0"
         disabled={!isValid || isLoading}
       >
         {isLoading ? "Saving..." : "Continue"}

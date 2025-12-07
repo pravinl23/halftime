@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS targeting_profiles (
   location TEXT,
   interests TEXT[],
   content_genres TEXT[],
-  selected_shows JSONB,
-  content_restrictions TEXT[],
+  excluded_shows JSONB,
+  excluded_keywords TEXT[],
   exclusions JSONB,
   is_default BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW()

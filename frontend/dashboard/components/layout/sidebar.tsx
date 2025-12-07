@@ -1,22 +1,44 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
+import {
+  BarChart3,
+  Users,
+  MapPin,
+  Settings,
+  LogOut,
+} from "lucide-react"
+import {
+  Sidebar as ShadcnSidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarFooter,
+  SidebarHeader,
+} from "@/components/ui/sidebar"
 
 const navigation = [
-  { name: "Home", href: "/dashboard", icon: "🏠" },
-  { name: "Campaigns", href: "/dashboard/campaigns", icon: "📊" },
-  { name: "Analytics", href: "/dashboard/analytics", icon: "📈" },
-  { name: "Settings", href: "/dashboard/settings", icon: "⚙️" },
+  { name: "Analytics", href: "/?view=analytics", icon: BarChart3 },
+  { name: "Viewers", href: "/?view=viewers", icon: Users },
+  { name: "Placements", href: "/?view=placements", icon: MapPin },
+  { name: "Preferences", href: "/?view=preferences", icon: Settings },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+  
+  const currentView = searchParams.get('view') || 'analytics'
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -26,48 +48,61 @@ export function Sidebar() {
   }
 
   return (
-    <div className="flex flex-col h-full w-64 border-r border-border bg-background">
-      {/* Logo */}
-      <div className="p-4 border-b border-border">
-        <h1 className="text-xl font-black">Dashboard</h1>
-        <p className="text-xs text-muted-foreground">AI Ads Platform</p>
-      </div>
+    <ShadcnSidebar className="bg-black relative z-10 border-r border-white/10">
+      <SidebarHeader className="border-b border-white/10 p-6 bg-black">
+        <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+          <img src="/logo.png" alt="HalfTime Logo" className="h-[20px] w-auto" />
+          HalfTime
+        </h1>
+        <p className="text-xs text-white/60 tracking-wider">AI Ads Platform</p>
+      </SidebarHeader>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`
-                flex items-center gap-3 px-4 py-3 rounded-full transition-colors
-                ${
-                  isActive
-                    ? "bg-primary/10 text-primary font-bold"
-                    : "text-foreground hover:bg-muted"
-                }
-              `}
-            >
-              <span className="text-xl">{item.icon}</span>
-              <span className="text-base">{item.name}</span>
-            </Link>
-          )
-        })}
-      </nav>
+      <SidebarContent className="bg-black">
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-white/60 text-[10px] tracking-widest px-4 py-3 font-medium">
+            Dashboard
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navigation.map((item) => {
+                const viewName = item.href.split('view=')[1]
+                const isActive = currentView === viewName
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton
+                      asChild
+                      className={`
+                        w-full px-4 py-2.5 transition-all border-l-2
+                        ${isActive 
+                          ? 'bg-white/10 text-white border-l-white' 
+                          : 'text-white/80 hover:bg-white/10 hover:text-white border-l-transparent'
+                        }
+                      `}
+                    >
+                      <Link href={item.href} className="flex w-full items-center gap-3">
+                        <item.icon className="h-4 w-4" />
+                        <span className="font-medium text-sm">{item.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
 
-      {/* Sign Out Button */}
-      <div className="p-4 border-t border-border">
+      <SidebarFooter className="border-t border-white/10 p-6 pb-8 bg-black">
         <Button
           onClick={handleSignOut}
           variant="outline"
-          className="w-full rounded-full font-bold"
+          className="glass-card w-full font-medium text-white hover:opacity-90 text-sm transition-all hover:scale-[1.02] active:scale-[0.98] py-3 border-0"
         >
+          <LogOut className="h-4 w-4 mr-2" />
           Sign Out
         </Button>
-      </div>
-    </div>
+      </SidebarFooter>
+    </ShadcnSidebar>
   )
 }
 

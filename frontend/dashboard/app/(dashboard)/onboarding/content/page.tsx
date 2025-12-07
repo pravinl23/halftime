@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { X, Search, Tv } from "lucide-react"
+import { X, Search, Tv, ChevronDown } from "lucide-react"
 
 const POPULAR_SHOWS = [
   { id: 1, name: "Breaking Bad", network: "AMC", genre: "Drama" },
@@ -27,11 +27,24 @@ const POPULAR_SHOWS = [
 
 export default function ContentSelectionPage() {
   const router = useRouter()
-  const [selectedShows, setSelectedShows] = useState<typeof POPULAR_SHOWS>([])
-  const [restrictions, setRestrictions] = useState<string[]>([])
-  const [restrictionInput, setRestrictionInput] = useState("")
+  const [excludedShows, setExcludedShows] = useState<typeof POPULAR_SHOWS>([])
+  const [excludedKeywords, setExcludedKeywords] = useState<string[]>([])
+  const [keywordInput, setKeywordInput] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const filteredShows = POPULAR_SHOWS.filter(show =>
     show.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -40,30 +53,25 @@ export default function ContentSelectionPage() {
   )
 
   const handleToggleShow = (show: typeof POPULAR_SHOWS[0]) => {
-    if (selectedShows.some(s => s.id === show.id)) {
-      setSelectedShows(selectedShows.filter(s => s.id !== show.id))
+    if (excludedShows.some(s => s.id === show.id)) {
+      setExcludedShows(excludedShows.filter(s => s.id !== show.id))
     } else {
-      setSelectedShows([...selectedShows, show])
+      setExcludedShows([...excludedShows, show])
     }
   }
 
-  const handleAddRestriction = () => {
-    if (restrictionInput.trim() && !restrictions.includes(restrictionInput.trim())) {
-      setRestrictions([...restrictions, restrictionInput.trim()])
-      setRestrictionInput("")
+  const handleAddKeyword = () => {
+    if (keywordInput.trim() && !excludedKeywords.includes(keywordInput.trim())) {
+      setExcludedKeywords([...excludedKeywords, keywordInput.trim()])
+      setKeywordInput("")
     }
   }
 
-  const handleRemoveRestriction = (restriction: string) => {
-    setRestrictions(restrictions.filter(r => r !== restriction))
+  const handleRemoveKeyword = (keyword: string) => {
+    setExcludedKeywords(excludedKeywords.filter(k => k !== keyword))
   }
 
   const handleSubmit = async () => {
-    if (selectedShows.length === 0) {
-      toast.error("Please select at least one show")
-      return
-    }
-
     setIsLoading(true)
 
     try {
@@ -79,7 +87,7 @@ export default function ContentSelectionPage() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
       const { data: { session } } = await supabase.auth.getSession()
 
-      // Save content preferences
+      // Save content exclusions
       const response = await fetch(`${apiUrl}/api/v1/onboarding/content-preferences`, {
         method: "POST",
         headers: {
@@ -87,13 +95,13 @@ export default function ContentSelectionPage() {
           "Authorization": `Bearer ${session?.access_token}`,
         },
         body: JSON.stringify({
-          selected_shows: selectedShows.map(s => ({
+          excluded_shows: excludedShows.map(s => ({
             id: s.id,
             name: s.name,
             network: s.network,
             genre: s.genre
           })),
-          content_restrictions: restrictions,
+          excluded_keywords: excludedKeywords,
         }),
       })
 
@@ -102,7 +110,7 @@ export default function ContentSelectionPage() {
       }
 
       toast.success("Onboarding complete!")
-      router.push("/dashboard")
+      router.push("/")
     } catch (error: any) {
       console.error("Submit error:", error)
       toast.error(error.message || "Failed to complete onboarding")
@@ -112,145 +120,135 @@ export default function ContentSelectionPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-white text-[32px] font-bold">Choose Content</h1>
-        <p className="text-white/60 text-[16px]">
-          Select shows where you'd like your ads to appear
-        </p>
-      </div>
-
-      {/* Search */}
-      <div className="space-y-3">
-        <Label className="text-white text-[15px] font-medium">Search Shows</Label>
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by name, network, or genre..."
-            className="h-14 pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl text-base backdrop-blur-md focus:bg-white/10 focus:border-white/20"
-          />
-        </div>
-      </div>
-
-      {/* Selected Shows */}
-      {selectedShows.length > 0 && (
-        <div className="space-y-3">
-          <Label className="text-white text-[15px] font-medium">
-            Selected Shows ({selectedShows.length})
-          </Label>
-          <div className="flex flex-wrap gap-2">
-            {selectedShows.map((show) => (
-              <Badge key={show.id} className="bg-[#1d9bf0] text-white border-[#1d9bf0] pl-3 pr-2 py-2">
-                <Tv className="h-3 w-3 mr-2" />
-                {show.name}
-                <button
-                  onClick={() => handleToggleShow(show)}
-                  className="ml-2 hover:text-red-200"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Show Grid */}
-      <div className="space-y-3">
-        <Label className="text-white text-[15px] font-medium">Popular Shows</Label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-2">
-          {filteredShows.map((show) => (
-            <div
-              key={show.id}
-              onClick={() => handleToggleShow(show)}
-              className={`p-4 rounded-xl cursor-pointer transition-all border ${
-                selectedShows.some(s => s.id === show.id)
-                  ? "bg-[#1d9bf0]/20 border-[#1d9bf0]"
-                  : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
-              }`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <h3 className="text-white font-semibold text-[15px]">{show.name}</h3>
-                  <p className="text-white/60 text-sm mt-1">{show.network}</p>
-                </div>
-                <Badge className="bg-white/10 text-white border-white/20 text-xs">
-                  {show.genre}
-                </Badge>
-              </div>
-              <div className="mt-3 flex items-center justify-end">
-                <div className={`w-5 h-5 rounded border ${
-                  selectedShows.some(s => s.id === show.id)
-                    ? "bg-[#1d9bf0] border-[#1d9bf0]"
-                    : "border-white/40"
-                }`} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Content Restrictions */}
-      <div className="space-y-3">
-        <div>
-          <Label htmlFor="restrictions" className="text-white text-[15px] font-medium">
-            Content Restrictions (Optional)
-          </Label>
-          <p className="text-white/60 text-sm mt-1">
-            Specify shows or content where you DON'T want your ads
+    <div className="max-w-4xl mx-auto">
+      <div className="glass-card p-8 space-y-6">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-white text-[28px] font-bold tracking-tight">Exclude Content</h1>
+          <p className="text-white/60 text-[15px]">
+            Select shows where you DON'T want your ads to appear
           </p>
         </div>
-        <div className="flex gap-2">
-          <Input
-            id="restrictions"
-            value={restrictionInput}
-            onChange={(e) => setRestrictionInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                handleAddRestriction()
-              }
-            }}
-            placeholder="e.g., violent shows, explicit content..."
-            className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl text-base px-4 backdrop-blur-md focus:bg-white/10 focus:border-white/20"
-          />
-          <Button
-            type="button"
-            onClick={handleAddRestriction}
-            disabled={!restrictionInput.trim()}
-            className="h-12 rounded-xl bg-white text-black font-bold hover:bg-white/90 px-6"
-          >
-            Add
-          </Button>
+
+        {/* Shows Dropdown */}
+        <div className="space-y-3 relative" ref={dropdownRef}>
+          <Label className="text-white text-[14px] font-medium">Exclude Shows (Optional)</Label>
+          <p className="text-white/60 text-sm">Select shows to exclude from ad placements</p>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowDropdown(!showDropdown)}
+              disabled={isLoading}
+              className="w-full h-12 px-4 bg-neutral-800 border border-white/20 text-white text-left flex items-center justify-between hover:bg-neutral-700 transition-all"
+            >
+              <span className={excludedShows.length === 0 ? "text-white/40" : ""}>
+                {excludedShows.length === 0 ? "Select shows to exclude..." : `${excludedShows.length} shows excluded`}
+              </span>
+              <ChevronDown className="h-4 w-4 text-white/60" />
+            </button>
+            {showDropdown && (
+              <div className="absolute z-50 w-full mt-2 bg-neutral-800 border border-white/30  overflow-hidden max-h-64 overflow-y-auto">
+                {filteredShows.map((show) => (
+                  <div
+                    key={show.id}
+                    onClick={() => handleToggleShow(show)}
+                    className="px-4 py-3 cursor-pointer hover:bg-neutral-700 transition-colors flex items-center gap-3 border-b border-white/10 last:border-b-0"
+                  >
+                    <div className={`w-4 h-4 rounded border ${excludedShows.some(s => s.id === show.id) ? 'bg-white border-white' : 'border-white/40'}`} />
+                    <div className="flex-1">
+                      <p className="text-white text-sm font-medium">{show.name}</p>
+                      <p className="text-white/70 text-xs">{show.network} • {show.genre}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        {restrictions.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {restrictions.map((restriction, index) => (
-              <Badge key={index} className="bg-red-500/20 text-red-300 border-red-500/40 pl-3 pr-2 py-2">
-                {restriction}
-                <button
-                  onClick={() => handleRemoveRestriction(restriction)}
-                  className="ml-2 hover:text-red-100"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            ))}
+
+        {/* Excluded Shows */}
+        {excludedShows.length > 0 && (
+          <div className="space-y-3">
+            <Label className="text-white text-[14px] font-medium">
+              Excluded Shows ({excludedShows.length})
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {excludedShows.map((show) => (
+                <Badge key={show.id} className="bg-red-500/20 text-red-300 border-red-500/40 pl-3 pr-2 py-2">
+                  <Tv className="h-3 w-3 mr-2" />
+                  {show.name}
+                  <button
+                    onClick={() => handleToggleShow(show)}
+                    className="ml-2 hover:text-red-100"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
           </div>
         )}
-      </div>
 
-      {/* Submit Button */}
-      <Button
-        onClick={handleSubmit}
-        disabled={selectedShows.length === 0 || isLoading}
-        className="w-full h-14 rounded-full bg-[#1d9bf0] text-white font-bold text-[17px] hover:bg-[#1a8cd8] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg"
-      >
-        {isLoading ? "Saving..." : "Complete Onboarding"}
-      </Button>
+
+        {/* Keyword Exclusions */}
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="keywords" className="text-white text-[14px] font-medium">
+              Keyword Exclusions (Optional)
+            </Label>
+            <p className="text-white/60 text-sm mt-1">
+              Add keywords to exclude content (e.g., violence, explicit, horror)
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Input
+              id="keywords"
+              value={keywordInput}
+              onChange={(e) => setKeywordInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleAddKeyword()
+                }
+              }}
+              placeholder="e.g., violence, explicit, horror..."
+              className="h-11 bg-neutral-800 border-white/20 text-white placeholder:text-white/50  text-base px-4 focus:bg-neutral-700 focus:border-white/30"
+            />
+            <Button
+              type="button"
+              onClick={handleAddKeyword}
+              disabled={!keywordInput.trim()}
+              className="h-11  bg-neutral-800 border border-white/20 text-white font-medium hover:bg-neutral-700 px-6"
+            >
+              Add
+            </Button>
+          </div>
+          {excludedKeywords.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {excludedKeywords.map((keyword, index) => (
+                <Badge key={index} className="bg-red-500/20 text-red-300 border-red-500/40 pl-3 pr-2 py-2">
+                  {keyword}
+                  <button
+                    onClick={() => handleRemoveKeyword(keyword)}
+                    className="ml-2 hover:text-red-100"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Submit Button */}
+        <Button
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="w-full h-12  bg-white text-black font-medium text-[16px] hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg"
+        >
+          {isLoading ? "Saving..." : "Complete Onboarding"}
+        </Button>
+      </div>
     </div>
   )
 }

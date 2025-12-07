@@ -63,15 +63,15 @@ export function CompanySearch({ onSelect }: CompanySearchProps) {
           placeholder="Search for your company (e.g., Nike, Apple, Starbucks...)"
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
-          className="h-14 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl text-base px-4 backdrop-blur-md focus:bg-white/10 focus:border-white/20 transition-all"
+          className="glass-card h-12 text-white placeholder:text-white/50 text-base px-4 hover:brightness-110 focus:opacity-90 transition-all border-0"
         />
         
         {results.length > 0 && (
-          <div className="absolute z-[100] w-full mt-2 bg-[#16181c] border border-white/20 rounded-xl overflow-hidden shadow-2xl max-h-64 overflow-y-auto">
+          <div className="glass-card absolute z-[100] w-full mt-2 overflow-hidden max-h-64 overflow-y-auto border-0">
             {results.map((company, index) => (
               <div
                 key={index}
-                className="p-4 cursor-pointer hover:bg-white/10 transition-colors border-b border-white/10 last:border-b-0"
+                className="p-4 cursor-pointer hover:bg-neutral-700 transition-colors border-b border-white/10 last:border-b-0"
                 onClick={() => {
                   onSelect(company)
                   setResults([])
@@ -90,8 +90,8 @@ export function CompanySearch({ onSelect }: CompanySearchProps) {
                     />
                   )}
                   <div>
-                    <p className="font-semibold text-white">{company.name}</p>
-                    <p className="text-sm text-white/60">{company.domain}</p>
+                    <p className="font-medium text-white">{company.name}</p>
+                    <p className="text-sm text-white/70">{company.domain}</p>
                   </div>
                 </div>
               </div>
