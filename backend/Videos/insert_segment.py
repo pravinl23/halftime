@@ -25,7 +25,9 @@ Example:
 
 import sys
 import os
-from moviepy import VideoFileClip, concatenate_videoclips
+import subprocess
+import tempfile
+from moviepy import VideoFileClip
 
 
 def parse_time(time_str):
@@ -133,42 +135,81 @@ def insert_segment(original_path, segment_path, start_time, end_time, output_pat
             print(f"Warning: End time ({end_seconds}s) exceeds video duration ({original.duration:.2f}s). Using video end.")
             end_seconds = original.duration
         
-        # Split the original video into before and after segments
-        clips = []
+        # Use ffmpeg directly for fast extraction and concatenation (avoids moviepy processing)
+        print(f"\nConcatenating clips via ffmpeg (fast mode)...")
         
-        # Part before the segment (if start_time > 0)
-        if start_seconds > 0:
-            before_clip = original.subclipped(0, start_seconds)
-            clips.append(before_clip)
-            print(f"Before segment: 0s to {start_seconds:.2f}s ({before_clip.duration:.2f}s)")
+        temp_dir = tempfile.mkdtemp(prefix="insert_segment_")
+        temp_clips = []
         
-        # The edited segment
-        clips.append(edited_segment)
-        print(f"Edited segment: {edited_segment_duration:.2f}s")
-        
-        # Part after the segment (if end_time < original duration)
-        if end_seconds < original.duration:
-            after_clip = original.subclipped(end_seconds, original.duration)
-            clips.append(after_clip)
-            print(f"After segment: {end_seconds:.2f}s to {original.duration:.2f}s ({after_clip.duration:.2f}s)")
-        
-        # Concatenate all clips
-        print(f"\nConcatenating {len(clips)} clips...")
-        final_video = concatenate_videoclips(clips, method="compose")
-        
-        print(f"Final video duration: {final_video.duration:.2f}s")
-        print(f"Writing output to: {output_path}")
-        
-        final_video.write_videofile(
-            output_path,
-            codec='libx264',
-            audio_codec='aac',
-            preset='medium',
-            logger=None  # Suppress verbose output
-        )
-        
-        # Clean up
-        final_video.close()
+        try:
+            # Extract before segment with ffmpeg (fast, no re-encoding)
+            if start_seconds > 0:
+                before_path = os.path.join(temp_dir, "before.mp4")
+                ffmpeg_cmd = [
+                    'ffmpeg', '-y', '-i', original_path,
+                    '-t', str(start_seconds),
+                    '-c', 'copy',  # Copy without re-encoding
+                    before_path
+                ]
+                subprocess.run(ffmpeg_cmd, capture_output=True, check=True)
+                temp_clips.append(before_path)
+                print(f"Before segment: 0s to {start_seconds:.2f}s")
+            
+            # Edited segment (already exists, just copy)
+            edited_copy = os.path.join(temp_dir, "edited.mp4")
+            import shutil
+            shutil.copy2(segment_path, edited_copy)
+            temp_clips.append(edited_copy)
+            print(f"Edited segment: {edited_segment_duration:.2f}s")
+            
+            # Extract after segment with ffmpeg (fast, no re-encoding)
+            if end_seconds < original.duration:
+                after_path = os.path.join(temp_dir, "after.mp4")
+                ffmpeg_cmd = [
+                    'ffmpeg', '-y', '-i', original_path,
+                    '-ss', str(end_seconds),
+                    '-c', 'copy',  # Copy without re-encoding
+                    after_path
+                ]
+                subprocess.run(ffmpeg_cmd, capture_output=True, check=True)
+                temp_clips.append(after_path)
+                print(f"After segment: {end_seconds:.2f}s to {original.duration:.2f}s")
+            
+            # Create concat file
+            concat_file = os.path.join(temp_dir, "concat.txt")
+            with open(concat_file, 'w') as f:
+                for temp_path in temp_clips:
+                    f.write(f"file '{temp_path}'\n")
+            
+            # Concatenate with ffmpeg (very fast, no re-encoding)
+            ffmpeg_cmd = [
+                'ffmpeg', '-y',
+                '-f', 'concat', '-safe', '0', '-i', concat_file,
+                '-c', 'copy',  # Copy streams without re-encoding
+                output_path
+            ]
+            
+            result = subprocess.run(
+                ffmpeg_cmd,
+                capture_output=True,
+                text=True
+            )
+            
+            if result.returncode != 0:
+                raise RuntimeError(f"ffmpeg concat failed: {result.stderr}")
+            
+            # Get final duration
+            final_video = VideoFileClip(output_path)
+            final_duration = final_video.duration
+            final_video.close()
+            
+            print(f"Final video duration: {final_duration:.2f}s")
+            
+        finally:
+            # Clean up temp files
+            if os.path.exists(temp_dir):
+                import shutil
+                shutil.rmtree(temp_dir)
         
         print(f"\nSuccessfully created: {output_path}")
         return output_path

@@ -109,11 +109,13 @@ def extract_segment(input_path, start_time, end_time, output_path=None):
         segment = video.subclipped(start_seconds, end_seconds)
         
         print(f"Writing output to: {output_path}")
+        # Use faster preset for intermediate extraction
         segment.write_videofile(
             output_path,
             codec='libx264',
             audio_codec='aac',
-            preset='medium',
+            preset='ultrafast',  # Faster encoding for intermediate files
+            threads=4,  # Use multiple threads
             logger=None  # Suppress verbose output
         )
         

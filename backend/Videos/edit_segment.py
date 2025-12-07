@@ -17,14 +17,9 @@ Usage:
 
 import sys
 import os
+import subprocess
 import numpy as np
 from moviepy import VideoFileClip
-
-
-def make_grayscale(frame):
-    """Convert a single frame to grayscale (black & white)."""
-    gray = np.dot(frame[..., :3], [0.299, 0.587, 0.114])
-    return gray[:, :, np.newaxis].repeat(3, axis=2).astype(np.uint8)
 
 
 def edit_segment(input_path, output_path=None, speed_factor=0.8):
@@ -64,33 +59,50 @@ def edit_segment(input_path, output_path=None, speed_factor=0.8):
         print(f"Original duration: {original_duration:.2f}s")
         print(f"Applying speed factor: {speed_factor}")
         
-        # Apply speed change (affects duration)
-        if speed_factor != 1.0:
-            processed = clip.with_speed_scaled(speed_factor)
-            new_duration = processed.duration
-            print(f"New duration: {new_duration:.2f}s ({'+' if new_duration > original_duration else ''}{new_duration - original_duration:.2f}s)")
+        # Use ffmpeg directly for much faster processing (avoids frame-by-frame)
+        print("Applying edits (speed + black & white) via ffmpeg...")
+        
+        # Build ffmpeg command for speed change + grayscale filter
+        # This is MUCH faster than frame-by-frame processing
+        # Handle audio tempo: atempo supports 0.5 to 2.0, chain if needed
+        if speed_factor < 0.5:
+            # Chain multiple atempo filters for very slow speeds
+            audio_filter = 'atempo=0.5,atempo=' + str(speed_factor / 0.5)
+        elif speed_factor > 2.0:
+            # Chain multiple atempo filters for very fast speeds
+            audio_filter = 'atempo=2.0,atempo=' + str(speed_factor / 2.0)
         else:
-            processed = clip
+            audio_filter = f'atempo={speed_factor}'
         
-        # Apply black & white effect
-        print("Applying black & white filter...")
-        final = processed.with_updated_frame_function(
-            lambda t: make_grayscale(processed.get_frame(t))
+        # Build filter complex: video (speed + grayscale) and audio (tempo)
+        filter_complex = f'[0:v]setpts={1/speed_factor}*PTS,format=gray,format=yuv420p[v];[0:a]{audio_filter}[a]'
+        
+        ffmpeg_cmd = [
+            'ffmpeg', '-y', '-i', input_path,
+            '-filter_complex', filter_complex,
+            '-map', '[v]', '-map', '[a]',
+            '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '23',
+            '-c:a', 'aac', '-b:a', '128k',
+            '-threads', '4',
+            output_path
+        ]
+        
+        # Run ffmpeg
+        result = subprocess.run(
+            ffmpeg_cmd,
+            capture_output=True,
+            text=True
         )
         
-        print(f"Writing output to: {output_path}")
-        final.write_videofile(
-            output_path,
-            codec='libx264',
-            audio_codec='aac',
-            preset='medium',
-            logger=None  # Suppress verbose output
-        )
+        if result.returncode != 0:
+            raise RuntimeError(f"ffmpeg failed: {result.stderr}")
         
-        # Clean up
-        final.close()
-        if processed != clip:
-            processed.close()
+        # Get new duration
+        processed = VideoFileClip(output_path)
+        new_duration = processed.duration
+        processed.close()
+        
+        print(f"New duration: {new_duration:.2f}s ({'+' if new_duration > original_duration else ''}{new_duration - original_duration:.2f}s)")
         
         print(f"\nSuccessfully edited: {output_path}")
         print(f"Duration change: {original_duration:.2f}s -> {new_duration:.2f}s")
