@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1 import auth, users, onboarding, profile
 from app.api.v1.videos import router as videos_router
+from app.api.v1 import analytics
 
 
 app = FastAPI(
@@ -49,6 +50,12 @@ app.include_router(
     videos_router,
     prefix=f"{settings.api_v1_prefix}/videos",
     tags=["videos"]
+)
+
+app.include_router(
+    analytics.router,
+    prefix=f"{settings.api_v1_prefix}/analytics",
+    tags=["analytics"]
 )
 
 

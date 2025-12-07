@@ -7,6 +7,7 @@ import { useParams } from "next/navigation"
 import { getVideoById, parseDuration } from "@/lib/videos"
 import { VideoPlayer } from "@/components/video/video-player"
 import { AdPopup } from "@/components/video/ad-popup"
+import { trackAdImpression, type AdTrackingContext } from "@/lib/analytics"
 
 export default function WatchPage() {
   const params = useParams()
@@ -15,16 +16,32 @@ export default function WatchPage() {
   
   const [showAdPopup, setShowAdPopup] = useState(false)
   const [adDismissed, setAdDismissed] = useState(false)
+  const [adImpressionTracked, setAdImpressionTracked] = useState(false)
+
+  // Create tracking context
+  const trackingContext: AdTrackingContext | undefined = video?.ad ? {
+    ad: video.ad,
+    videoId: videoId,
+    showName: video.title,
+    adPosition: video.ad.startTime
+  } : undefined
 
   // Reset dismissed state when video changes
   useEffect(() => {
     setAdDismissed(false)
     setShowAdPopup(false)
+    setAdImpressionTracked(false)
   }, [videoId])
 
   const handleAdStart = () => {
     if (!adDismissed) {
       setShowAdPopup(true)
+      
+      // Track impression once when ad starts
+      if (!adImpressionTracked && trackingContext) {
+        trackAdImpression(trackingContext)
+        setAdImpressionTracked(true)
+      }
     }
   }
 
@@ -70,6 +87,7 @@ export default function WatchPage() {
         onAdStart={handleAdStart}
         onAdEnd={handleAdEnd}
         className="w-full h-full"
+        trackingContext={trackingContext}
       />
 
       {/* Ad Popup */}
@@ -78,6 +96,7 @@ export default function WatchPage() {
           ad={video.ad}
           visible={showAdPopup}
           onDismiss={handleDismissAd}
+          trackingContext={trackingContext}
         />
       )}
     </div>

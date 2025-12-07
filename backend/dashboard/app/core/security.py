@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Optional
 import jwt
 from app.core.config import settings
 
@@ -53,4 +54,40 @@ async def get_current_user(
             detail=f"Could not validate credentials: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+async def get_current_user_optional(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False))
+) -> Optional[dict]:
+    """
+    Optionally verify the JWT token and return the current user.
+    Returns None if no token is provided or token is invalid.
+    
+    Args:
+        credentials: Optional HTTP Bearer token from Authorization header
+        
+    Returns:
+        User data dictionary or None
+    """
+    if not credentials:
+        return None
+    
+    token = credentials.credentials
+    
+    try:
+        payload = jwt.decode(
+            token,
+            options={"verify_signature": False}
+        )
+        
+        user_id = payload.get("sub")
+        email = payload.get("email")
+        
+        if not user_id:
+            return None
+        
+        return {"id": user_id, "email": email}
+        
+    except Exception:
+        return None
 

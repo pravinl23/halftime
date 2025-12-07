@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Users, MapPin, ArrowUp, ArrowDown } from "lucide-react"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Line, LineChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, Area, AreaChart } from "recharts"
+import { getMovie } from "@/lib/omdb"
 
 const conversionData = [
   { date: "Dec 1", conversions: 124 },
@@ -76,8 +77,8 @@ const adEngagement = [
   {
     adName: "ad_xk8v2p9m",
     videoId: "vid_4f9a",
-    show: "The Office",
-    poster: "https://m.media-amazon.com/images/M/MV5BMDNkOTE4NDQtMTNmYi00MWE0LWE4MTgtYzU3MjgxYzM5ZjViXkEyXkFqcGdeQXVyMzQ2MDI5NjU@._V1_SX300.jpg",
+    show: "Suits",
+    poster: "https://m.media-amazon.com/images/M/MV5BNmVmMmM5ZmItZDg0OC00NTFiLWIxNzctZjNmYTY5OTU3ZWU3XkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
     score: 86,
     metrics: [
       { label: "View Rate", value: 84 },
@@ -88,8 +89,8 @@ const adEngagement = [
   {
     adName: "ad_j3n7q5wr",
     videoId: "vid_b21c",
-    show: "Breaking Bad",
-    poster: "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg",
+    show: "SpongeBob SquarePants",
+    poster: "https://m.media-amazon.com/images/M/MV5BNTk2OTYyMjkzN15BMl5BanBnXkFtZTgwOTQzNDQxMTE@._V1_SX300.jpg",
     score: 74,
     metrics: [
       { label: "View Rate", value: 71 },
@@ -107,6 +108,78 @@ const adEngagement = [
       { label: "View Rate", value: 38 },
       { label: "Completion", value: 15 },
       { label: "Click Rate", value: 3 },
+    ],
+  },
+  {
+    adName: "ad_office_1",
+    videoId: "vid_office_1",
+    show: "The Office",
+    poster: "https://m.media-amazon.com/images/M/MV5BMDNkOTE4NDQtMTNmYi00MWE0LWE4MTgtYzU3MjgxYzM5ZjViXkEyXkFqcGdeQXVyMzQ2MDI5NjU@._V1_SX300.jpg",
+    score: 78,
+    metrics: [
+      { label: "View Rate", value: 72 },
+      { label: "Completion", value: 58 },
+      { label: "Click Rate", value: 15 },
+    ],
+  },
+  {
+    adName: "ad_bb_1",
+    videoId: "vid_bb_1",
+    show: "Breaking Bad",
+    poster: "https://m.media-amazon.com/images/M/MV5BYmQ4YWMxYjUtNjZmYi00MDQ1LWFjMjMtNjA5ZDdiYjdiODU5XkEyXkFqcGdeQXVyMTMzNDExODE5._V1_SX300.jpg",
+    score: 82,
+    metrics: [
+      { label: "View Rate", value: 79 },
+      { label: "Completion", value: 68 },
+      { label: "Click Rate", value: 11 },
+    ],
+  },
+  {
+    adName: "ad_got_1",
+    videoId: "vid_got_1",
+    show: "Game of Thrones",
+    poster: "https://m.media-amazon.com/images/M/MV5BN2IzYzBiOTQtNGZmMi00NDI5LTgxMzMtN2EzZjA1NjhlOGMxXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_SX300.jpg",
+    score: 91,
+    metrics: [
+      { label: "View Rate", value: 88 },
+      { label: "Completion", value: 75 },
+      { label: "Click Rate", value: 18 },
+    ],
+  },
+  {
+    adName: "ad_st_1",
+    videoId: "vid_st_1",
+    show: "Stranger Things",
+    poster: "https://m.media-amazon.com/images/M/MV5BMDZkYmVhNjMtNWU4MC00MDQxLWE3MjYtZGMzZWI1ZjhlOWJmXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_SX300.jpg",
+    score: 88,
+    metrics: [
+      { label: "View Rate", value: 85 },
+      { label: "Completion", value: 72 },
+      { label: "Click Rate", value: 16 },
+    ],
+  },
+  {
+    adName: "ad_sp_1",
+    videoId: "vid_sp_1",
+    show: "South Park",
+    poster: "https://m.media-amazon.com/images/M/MV5BZjNkN2I3NWMtNzRlZi00NDFlLWFkNDgtNGM4MDViNjM2YzBkXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SX300.jpg",
+    score: 65,
+    metrics: [
+      { label: "View Rate", value: 61 },
+      { label: "Completion", value: 48 },
+      { label: "Click Rate", value: 9 },
+    ],
+  },
+  {
+    adName: "ad_simpsons_1",
+    videoId: "vid_simpsons_1",
+    show: "The Simpsons",
+    poster: "https://m.media-amazon.com/images/M/MV5BYjFkMTlkYWUtZWFhNy00M2FmLThiOTYtYTRiYjVlZWYxNmJkXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_SX300.jpg",
+    score: 69,
+    metrics: [
+      { label: "View Rate", value: 64 },
+      { label: "Completion", value: 52 },
+      { label: "Click Rate", value: 10 },
     ],
   },
 ]
@@ -145,6 +218,7 @@ export default function DashboardPage() {
   const view = searchParams.get("view") || "analytics"
   const [placements, setPlacements] = useState(placements_data)
   const [isAddOpen, setIsAddOpen] = useState(false)
+  const [adEngagementWithPosters, setAdEngagementWithPosters] = useState(adEngagement)
   
   const [stats, setStats] = useState({
     totalImpressions: 0,
@@ -154,6 +228,29 @@ export default function DashboardPage() {
     costPerConversion: 0,
     totalConversions: 0,
   })
+  
+  // Fetch OMDb posters for ad engagement cards
+  useEffect(() => {
+    const fetchPosters = async () => {
+      const updated = await Promise.all(
+        adEngagement.map(async (ad) => {
+          try {
+            const omdbData = await getMovie(ad.show)
+            if (omdbData?.Poster && omdbData.Poster !== "N/A") {
+              return { ...ad, poster: omdbData.Poster }
+            }
+          } catch (error) {
+            console.error(`Failed to fetch poster for ${ad.show}:`, error)
+          }
+          return ad
+        })
+      )
+      setAdEngagementWithPosters(updated)
+    }
+    
+    fetchPosters()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // State for viewers page
   const [selectedUser, setSelectedUser] = useState(viewerUsers[0])
@@ -542,7 +639,7 @@ export default function DashboardPage() {
         <div className="flex-1 overflow-y-auto p-6 bg-transparent pt-0">
 
           <div className="flex flex-wrap justify-center gap-4">
-            {adEngagement.map((ad, adIndex) => (
+            {adEngagementWithPosters.map((ad, adIndex) => (
               <div key={ad.videoId} className="flex flex-col group w-full md:w-[calc(50%-0.5rem)] xl:w-[calc(33.333%-0.67rem)] 2xl:w-[calc(25%-0.75rem)]">
                 {/* Card Container */}
                 <div className="glass-card flex overflow-hidden  transition-all border-0">
@@ -551,12 +648,20 @@ export default function DashboardPage() {
                   <div className="relative flex-1 bg-black">
                      {/* Aspect Ratio spacer - portrait format matching posters */}
                     <div className="pt-[150%]" />
-                    {ad.poster && (
+                    {ad.poster ? (
                       <img 
                         src={ad.poster} 
                         alt={ad.show}
                         className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => {
+                          // Hide broken images
+                          (e.target as HTMLImageElement).style.display = 'none'
+                        }}
                       />
+                    ) : (
+                      <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
+                        <span className="text-gray-500 text-4xl">?</span>
+                      </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/60 flex flex-col justify-between p-3">
                         <div className="flex justify-between items-start">
@@ -570,9 +675,12 @@ export default function DashboardPage() {
                              </div>
                         </div>
                         <div className="mt-auto">
-                           <h3 className="text-white font-medium text-sm leading-tight line-clamp-2 drop-shadow-md">
-                             {ad.adName}
+                           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 drop-shadow-md uppercase">
+                             {ad.show}
                            </h3>
+                           <p className="text-white/70 text-xs mt-1 font-mono">
+                             {ad.adName}
+                           </p>
                         </div>
                     </div>
                   </div>
@@ -615,18 +723,26 @@ export default function DashboardPage() {
             ))}
             
             {/* Additional variant ads */}
-            {adEngagement.slice(0, 2).map((randomAd, i) => {
+            {adEngagementWithPosters.slice(0, 2).map((randomAd, i) => {
               return (
                <div key={`additional-random-${i}`} className="flex flex-col group opacity-70 hover:opacity-100 transition-all w-full md:w-[calc(50%-0.5rem)] xl:w-[calc(33.333%-0.67rem)] 2xl:w-[calc(25%-0.75rem)]">
                 <div className="glass-card flex overflow-hidden  transition-all border-0">
                   <div className="relative flex-1 bg-black">
                     <div className="pt-[150%]" />
-                    {randomAd.poster && (
+                    {randomAd.poster ? (
                       <img 
                         src={randomAd.poster} 
                         alt={randomAd.show}
                         className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => {
+                          // Hide broken images
+                          (e.target as HTMLImageElement).style.display = 'none'
+                        }}
                       />
+                    ) : (
+                      <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
+                        <span className="text-gray-500 text-4xl">?</span>
+                      </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/60 flex flex-col justify-between p-3">
                         <div className="flex justify-between items-start">
@@ -640,9 +756,12 @@ export default function DashboardPage() {
                              </div>
                         </div>
                         <div className="mt-auto">
-                           <h3 className="text-white font-medium text-sm leading-tight line-clamp-2 drop-shadow-md">
-                             {randomAd.adName}_v{i + 1}
+                           <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 drop-shadow-md uppercase">
+                             {randomAd.show}
                            </h3>
+                           <p className="text-white/70 text-xs mt-1 font-mono">
+                             {randomAd.adName}_v{i + 1}
+                           </p>
                         </div>
                     </div>
                   </div>
@@ -659,20 +778,26 @@ export default function DashboardPage() {
                       <div className="text-[10px] text-white/30 mt-0.5">Engagement Score</div>
                     </div>
                     <div className="flex-1 flex flex-col justify-between py-1">
-                      {randomAd.metrics.map((metric) => (
-                        <div key={metric.label} className="w-full">
-                          <div className="flex justify-between items-end text-[10px] mb-1 font-medium gap-2">
-                             <span className="text-white/40 truncate min-w-0" title={metric.label}>{metric.label}</span>
-                             <span className="text-white/70 font-mono flex-shrink-0">{Math.floor(Math.random() * 40) + 30}%</span>
+                      {randomAd.metrics.map((metric, metricIdx) => {
+                        // Deterministic values based on index to avoid hydration errors
+                        const baseValue = metric.value;
+                        const variation = (i * 10) + (metricIdx * 5);
+                        const variantValue = Math.max(30, Math.min(90, baseValue - 10 + (variation % 20)));
+                        return (
+                          <div key={metric.label} className="w-full">
+                            <div className="flex justify-between items-end text-[10px] mb-1 font-medium gap-2">
+                               <span className="text-white/40 truncate min-w-0" title={metric.label}>{metric.label}</span>
+                               <span className="text-white/70 font-mono flex-shrink-0">{variantValue}%</span>
+                            </div>
+                            <div className="h-0.5 bg-white/5 w-full">
+                              <div 
+                                className="h-full bg-white/60"
+                                style={{ width: `${variantValue}%` }}
+                              />
+                            </div>
                           </div>
-                          <div className="h-0.5 bg-white/5 w-full">
-                            <div 
-                              className="h-full bg-white/60"
-                              style={{ width: `${Math.floor(Math.random() * 40) + 30}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>

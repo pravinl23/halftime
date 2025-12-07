@@ -12,6 +12,7 @@ import {
   SkipForward
 } from "lucide-react"
 import type { Ad } from "@/lib/videos"
+import { trackAdClick, type AdTrackingContext } from "@/lib/analytics"
 
 interface VideoPlayerProps {
   src: string
@@ -21,6 +22,7 @@ interface VideoPlayerProps {
   onAdStart?: () => void
   onAdEnd?: () => void
   className?: string
+  trackingContext?: AdTrackingContext // Context for analytics tracking
 }
 
 export function VideoPlayer({
@@ -30,7 +32,8 @@ export function VideoPlayer({
   expectedDuration,
   onAdStart,
   onAdEnd,
-  className = ""
+  className = "",
+  trackingContext
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -372,6 +375,12 @@ export function VideoPlayer({
                 }}
                 onClick={(e) => {
                   e.stopPropagation()
+                  
+                  // Track click
+                  if (trackingContext) {
+                    trackAdClick(trackingContext, "marker")
+                  }
+                  
                   if (ad.ctaUrl) {
                     window.open(ad.ctaUrl, '_blank')
                   }
