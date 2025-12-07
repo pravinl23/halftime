@@ -2,10 +2,8 @@ import { Navbar } from "@/components/layout/navbar"
 import { VideoRow } from "@/components/layout/video-row"
 import { ContinueWatchingRow } from "@/components/layout/continue-watching-row"
 import { getMovie } from "@/lib/omdb"
+import { getVideoById } from "@/lib/videos"
 import type { Video, ContinueWatchingItem } from "@/lib/mock-data"
-
-// Reusing the types from mock-data for now to maintain compatibility with components
-// Ideally, these types should be moved to a shared types file
 
 export default async function Home() {
   // Fetch data for various shows
@@ -68,7 +66,7 @@ export default async function Home() {
   // Generate Continue Watching List with specific episodes
   if (showsMap.get("South Park")) {
     continueWatchingItems.push({
-      id: "cw1",
+      id: "1",
       title: "South Park: Veal",
       thumbnailUrl: showsMap.get("South Park")?.Poster || "/shows/southpark.jpeg",
       timeRemaining: "15m remaining",
@@ -79,7 +77,7 @@ export default async function Home() {
   
   if (showsMap.get("Suits")) {
     continueWatchingItems.push({
-      id: "cw2",
+      id: "2",
       title: "Suits: Pilot",
       thumbnailUrl: showsMap.get("Suits")?.Poster || "/shows/suits.jpeg",
       timeRemaining: "25m remaining",
@@ -90,7 +88,7 @@ export default async function Home() {
 
   if (showsMap.get("Rick and Morty")) {
     continueWatchingItems.push({
-      id: "cw3",
+      id: "3",
       title: "Rick and Morty: Pilot",
       thumbnailUrl: showsMap.get("Rick and Morty")?.Poster || "/shows/southpark.jpeg", // Fallback
       timeRemaining: "8m remaining",
@@ -98,7 +96,6 @@ export default async function Home() {
       episode: "S1:E1"
     });
   }
-
 
   return (
     <div className="relative min-h-screen bg-black">
