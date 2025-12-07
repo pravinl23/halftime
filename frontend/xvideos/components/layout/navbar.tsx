@@ -227,6 +227,7 @@ export function Navbar() {
                 <button
                   className="p-2 hover:bg-gray-800 rounded-full transition-colors outline-none"
                   aria-label="Notifications"
+                  suppressHydrationWarning
                 >
                   <Bell className="w-5 h-5 text-white hover:text-gray-300 transition-colors" />
                 </button>
@@ -245,6 +246,7 @@ export function Navbar() {
                 <button
                   className="p-1 hover:bg-gray-800 rounded-full transition-colors outline-none"
                   aria-label="Profile"
+                  suppressHydrationWarning
                 >
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 border border-white/10">
                     <img 

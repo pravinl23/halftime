@@ -2,21 +2,23 @@ import { Navbar } from "@/components/layout/navbar"
 import { VideoRow } from "@/components/layout/video-row"
 import { ContinueWatchingRow } from "@/components/layout/continue-watching-row"
 import { getMovie } from "@/lib/omdb"
-import { getVideoById } from "@/lib/videos"
+import { getAllVideos } from "@/lib/videos"
 import type { Video, ContinueWatchingItem } from "@/lib/mock-data"
 
 export default async function Home() {
-  // Fetch data for various shows
-  const showTitles = [
-    "South Park",
-    "Suits",
-    "Rick and Morty",
-    "The Office",
-    "Breaking Bad",
-    "Game of Thrones",
-    "Stranger Things",
-    "The Simpsons"
-  ];
+  // Get videos from our data store - first 3 are Suits, SpongeBob, Friends
+  const allVideos = getAllVideos()
+  
+  // First 3 videos in correct order: Suits, SpongeBob, Friends
+  const priorityVideos = allVideos.slice(0, 3) // IDs 1, 2, 3
+  // Rest of the videos in any order
+  const otherVideos = allVideos.slice(3)
+  
+  // Combine: priority first, then the rest
+  const orderedVideos = [...priorityVideos, ...otherVideos]
+  
+  // Fetch OMDb data for visual appeal
+  const showTitles = orderedVideos.map(v => v.title);
 
   const showsData = await Promise.all(
     showTitles.map(title => getMovie(title))
@@ -33,66 +35,74 @@ export default async function Home() {
   const movies: Video[] = [];
   const continueWatchingItems: ContinueWatchingItem[] = [];
 
-  // Helper to create video objects with fallback
-  const createVideo = (id: string, title: string): Video => {
-    const data = showsMap.get(title);
-    // Default fallback data if API fails
+  // Helper to create video objects with fallback, using our video data
+  const createVideo = (video: typeof orderedVideos[0], index: number): Video => {
+    const omdbData = showsMap.get(video.title);
+    // Use video data from our store as fallback
     const defaultData = {
-      Poster: "/shows/southpark.jpeg",
-      Rated: "TV-MA",
-      Year: "2000",
-      Genre: "Comedy"
+      Poster: video.thumbnail,
+      Rated: video.rating || "TV-MA",
+      Year: video.year || "2000",
+      Genre: video.genre || "Comedy"
     };
     
-    const poster = data?.Poster && data.Poster !== "N/A" ? data.Poster : defaultData.Poster;
+    const poster = omdbData?.Poster && omdbData.Poster !== "N/A" ? omdbData.Poster : defaultData.Poster;
     
     return {
-      id,
-      title: (data?.Title || title).toUpperCase(),
+      id: video.id,
+      title: (omdbData?.Title || video.title).toUpperCase(),
       thumbnailUrl: poster,
-      rating: data?.Rated || defaultData.Rated,
-      year: (data?.Year || defaultData.Year).split("–")[0],
-      genre: (data?.Genre || defaultData.Genre).split(", ").slice(0, 2),
+      rating: omdbData?.Rated || defaultData.Rated,
+      year: (omdbData?.Year || defaultData.Year).split("–")[0],
+      genre: (omdbData?.Genre || defaultData.Genre).split(", ").slice(0, 2),
       studio: "TV Network", // OMDb doesn't provide consistent network info
-      isNew: id === "1" || id === "3" // Mock "New" badge logic
+      isNew: index < 2 // First 2 get "New" badge
     };
   };
 
-  // Generate Recommended List from the fetched shows
-  showTitles.forEach((title, index) => {
-    movies.push(createVideo((index + 1).toString(), title));
+  // Generate Recommended List from ordered videos
+  orderedVideos.forEach((video, index) => {
+    movies.push(createVideo(video, index));
   });
 
   // Generate Continue Watching List with specific episodes
-  if (showsMap.get("South Park")) {
+  // Use the ordered videos: Suits (id: 1), SpongeBob (id: 2), Friends (id: 3)
+  const suitsVideo = orderedVideos.find(v => v.id === "1")
+  const spongebobVideo = orderedVideos.find(v => v.id === "2")
+  const friendsVideo = orderedVideos.find(v => v.id === "3")
+  
+  if (suitsVideo) {
+    const omdbData = showsMap.get(suitsVideo.title)
     continueWatchingItems.push({
       id: "1",
-      title: "South Park: Veal",
-      thumbnailUrl: showsMap.get("South Park")?.Poster || "/shows/southpark.jpeg",
-      timeRemaining: "15m remaining",
-      rating: "TV-MA",
-      episode: "S10:E12"
+      title: "Suits: Pilot",
+      thumbnailUrl: omdbData?.Poster && omdbData.Poster !== "N/A" ? omdbData.Poster : suitsVideo.thumbnail,
+      timeRemaining: "25m remaining",
+      rating: suitsVideo.rating || "TV-14",
+      episode: "S1:E1"
     });
   }
   
-  if (showsMap.get("Suits")) {
+  if (spongebobVideo) {
+    const omdbData = showsMap.get(spongebobVideo.title)
     continueWatchingItems.push({
       id: "2",
-      title: "Suits: Pilot",
-      thumbnailUrl: showsMap.get("Suits")?.Poster || "/shows/suits.jpeg",
-      timeRemaining: "25m remaining",
-      rating: "TV-14",
+      title: "SpongeBob: Pilot",
+      thumbnailUrl: omdbData?.Poster && omdbData.Poster !== "N/A" ? omdbData.Poster : spongebobVideo.thumbnail,
+      timeRemaining: "8m remaining",
+      rating: spongebobVideo.rating || "TV-Y",
       episode: "S1:E1"
     });
   }
 
-  if (showsMap.get("Rick and Morty")) {
+  if (friendsVideo) {
+    const omdbData = showsMap.get(friendsVideo.title)
     continueWatchingItems.push({
       id: "3",
-      title: "Rick and Morty: Pilot",
-      thumbnailUrl: showsMap.get("Rick and Morty")?.Poster || "/shows/southpark.jpeg", // Fallback
-      timeRemaining: "8m remaining",
-      rating: "TV-14",
+      title: "Friends: Pilot",
+      thumbnailUrl: omdbData?.Poster && omdbData.Poster !== "N/A" ? omdbData.Poster : friendsVideo.thumbnail,
+      timeRemaining: "15m remaining",
+      rating: friendsVideo.rating || "TV-14",
       episode: "S1:E1"
     });
   }

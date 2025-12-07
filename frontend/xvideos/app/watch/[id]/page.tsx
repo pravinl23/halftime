@@ -1,47 +1,36 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { getVideoById } from "@/lib/videos"
+import { getVideoById, parseDuration } from "@/lib/videos"
+import { VideoPlayer } from "@/components/video/video-player"
 import { AdPopup } from "@/components/video/ad-popup"
 
 export default function WatchPage() {
   const params = useParams()
   const videoId = params.id as string
   const video = getVideoById(videoId)
-  const videoRef = useRef<HTMLVideoElement>(null)
   
   const [showAdPopup, setShowAdPopup] = useState(false)
   const [adDismissed, setAdDismissed] = useState(false)
-
-  // Track video time and show ad popup during ad segment
-  useEffect(() => {
-    const videoElement = videoRef.current
-    if (!videoElement || !video?.ad) return
-
-    const handleTimeUpdate = () => {
-      const currentTime = videoElement.currentTime
-      const ad = video.ad!
-      
-      // Show popup during ad segment (unless dismissed)
-      if (currentTime >= ad.startTime && currentTime <= ad.endTime && !adDismissed) {
-        setShowAdPopup(true)
-      } else {
-        setShowAdPopup(false)
-      }
-    }
-
-    videoElement.addEventListener("timeupdate", handleTimeUpdate)
-    return () => videoElement.removeEventListener("timeupdate", handleTimeUpdate)
-  }, [video, adDismissed])
 
   // Reset dismissed state when video changes
   useEffect(() => {
     setAdDismissed(false)
     setShowAdPopup(false)
   }, [videoId])
+
+  const handleAdStart = () => {
+    if (!adDismissed) {
+      setShowAdPopup(true)
+    }
+  }
+
+  const handleAdEnd = () => {
+    setShowAdPopup(false)
+  }
 
   const handleDismissAd = () => {
     setAdDismissed(true)
@@ -72,15 +61,15 @@ export default function WatchPage() {
         </div>
       </div>
 
-      {/* Native HTML5 Video Player */}
-      <video
-        ref={videoRef}
-        className="w-full h-full object-contain"
+      {/* Custom Video Player with Ad Markers */}
+      <VideoPlayer
         src={video.videoUrl}
         poster={video.thumbnail}
-        controls
-        autoPlay
-        controlsList="nodownload"
+        ad={video.ad}
+        expectedDuration={parseDuration(video.duration)}
+        onAdStart={handleAdStart}
+        onAdEnd={handleAdEnd}
+        className="w-full h-full"
       />
 
       {/* Ad Popup */}
