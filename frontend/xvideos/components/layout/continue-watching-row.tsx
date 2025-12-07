@@ -11,9 +11,35 @@ interface ContinueWatchingRowProps {
   items: ContinueWatchingItem[]
 }
 
+// Helper function to track watched shows in localStorage
+function trackWatchedShow(showTitle: string) {
+  if (typeof window === "undefined") return
+  
+  try {
+    const stored = localStorage.getItem("watchedShows")
+    const watchedShows: string[] = stored ? JSON.parse(stored) : []
+    
+    // Add show if not already in the list
+    if (!watchedShows.includes(showTitle)) {
+      watchedShows.push(showTitle)
+      // Keep only the last 50 shows
+      if (watchedShows.length > 50) {
+        watchedShows.shift()
+      }
+      localStorage.setItem("watchedShows", JSON.stringify(watchedShows))
+    }
+  } catch (e) {
+    console.error("Error tracking watched show:", e)
+  }
+}
+
 export function ContinueWatchingRow({ title, items }: ContinueWatchingRowProps) {
   const rowRef = useRef<HTMLDivElement>(null)
   const [isMoved, setIsMoved] = useState(false)
+
+  const handleShowClick = (showTitle: string) => {
+    trackWatchedShow(showTitle)
+  }
 
   const handleClick = (direction: "left" | "right") => {
     setIsMoved(true)
@@ -52,6 +78,7 @@ export function ContinueWatchingRow({ title, items }: ContinueWatchingRowProps) 
             <Link
               key={item.id}
               href={`/watch/${item.id}`}
+              onClick={() => handleShowClick(item.title)}
               className="relative w-[280px] md:w-[320px] shrink-0 cursor-pointer transition duration-200 ease-out hover:scale-105 hover:z-50 group/item active:scale-95 shadow-md hover:shadow-xl"
             >
               <div className="relative aspect-video rounded overflow-hidden bg-gray-900 group-hover/item:border-2 group-hover/item:border-white transition-all">

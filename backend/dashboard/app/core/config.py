@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     
     # Supabase
     supabase_url: str
-    supabase_service_key: str
+    supabase_service_key: str | None = None
     supabase_anon_key: str
     
     # CORS
@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+        extra = "ignore"  # Allow extra env vars for other services (Grok, X API)
 
 
 settings = Settings()

@@ -375,6 +375,83 @@ Respond with this exact JSON structure:
                 return json.loads(json_match.group())
             raise ValueError(f"Failed to parse Grok response as JSON: {response[:500]}")
 
+    def suggest_product(self, user_profile: dict) -> dict:
+        """
+        Suggest a single product/service to advertise based on user profile.
+        Uses Grok to intelligently recommend products without a predefined list.
+        
+        Args:
+            user_profile: Enriched user profile from analyze_user_demographics containing:
+                - interests: List of user interests
+                - demographics: Dict with age_range, segment, location
+                - content_preferences: What content they consume
+                - values: User values and priorities
+                - product_affinities: Types of products they'd like
+        
+        Returns:
+            Dict with product recommendation:
+            {
+                "product": "Product name",
+                "company": "Company/brand name",
+                "category": "Product category",
+                "reason": "Why this product is perfect for this user",
+                "confidence": 0.0-1.0,
+                "ad_approach": "How to present this ad to the user"
+            }
+        """
+        system_prompt = """You are an expert advertising strategist. Your job is to suggest THE perfect product or service to advertise to a specific user based on their demographic profile, interests, and preferences.
+
+You will receive a detailed user profile and must suggest ONE specific, real product/service that would resonate most with this person.
+
+Guidelines:
+- Suggest real products/brands that exist (e.g., "Gymshark Lifting Straps", "Apple AirPods Pro", "Nike Air Max")
+- Be specific - don't just say "fitness equipment", say the exact product
+- Consider the user's age, interests, values, and content preferences
+- Think about what would genuinely appeal to this person, not just generic ads
+- The product should feel like a natural fit, not a forced recommendation
+
+IMPORTANT: Always respond with valid JSON only."""
+
+        user_prompt = f"""Based on this user profile, suggest THE ONE perfect product to advertise to them.
+
+## User Profile
+{json.dumps(user_profile, indent=2)}
+
+## Your Task
+Analyze this user's demographics, interests, values, and preferences to suggest ONE specific product/service that would genuinely appeal to them.
+
+Think about:
+- What problems might they have that a product could solve?
+- What aspirations do they have?
+- What brands align with their values?
+- What would they actually want to buy?
+
+Respond with this exact JSON structure:
+{{
+    "product": "Specific product name (e.g., 'Lifting Straps', 'AirPods Pro 2')",
+    "company": "Brand/company name (e.g., 'Gymshark', 'Apple')",
+    "category": "Product category (e.g., 'Fitness Accessories', 'Electronics')",
+    "reason": "Detailed explanation of why this product is perfect for this user based on their profile",
+    "confidence": 0.0 to 1.0,
+    "ad_approach": "How to present this ad (e.g., 'Show during workout content, emphasize performance gains')"
+}}"""
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+        
+        response = self.chat(messages, temperature=0.6, json_response=True, max_tokens=1024)
+        
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            import re
+            json_match = re.search(r'\{[\s\S]*\}', response)
+            if json_match:
+                return json.loads(json_match.group())
+            raise ValueError(f"Failed to parse Grok response as JSON: {response[:500]}")
+
 
 if __name__ == "__main__":
     # Quick test

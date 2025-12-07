@@ -8,6 +8,56 @@ import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
+// Backend API URL - adjust if your backend runs on a different port
+const BACKEND_API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
+
+// Helper function to get watched shows from localStorage
+function getWatchedShows(): string[] {
+  if (typeof window === "undefined") return []
+  try {
+    const stored = localStorage.getItem("watchedShows")
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
+  }
+}
+
+// Helper function to analyze user profile after login
+async function analyzeUserProfile(accessToken: string) {
+  try {
+    const watchedShows = getWatchedShows()
+    
+    const response = await fetch(`${BACKEND_API_URL}/api/v1/profile/analyze`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        platform_data: {
+          shows_watched: watchedShows,
+          cookies: {
+            // Add any relevant cookie data here
+            visited_pages: typeof document !== "undefined" ? [document.referrer].filter(Boolean) : []
+          },
+          browsing_history: []
+        }
+      })
+    })
+    
+    if (!response.ok) {
+      console.error("Profile analysis failed:", response.status, response.statusText)
+      return null
+    }
+    
+    const result = await response.json()
+    return result
+  } catch (error) {
+    console.error("Error analyzing profile:", error)
+    return null
+  }
+}
+
 export function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -30,9 +80,42 @@ export function LoginForm() {
         return
       }
 
+      // Get the access token for API calls
+      const accessToken = data.session?.access_token
+
+      // Redirect immediately - don't wait for analysis
       toast.success("Logged in successfully!")
       router.push("/")
       router.refresh()
+
+      // Analyze user profile in the background (fire and forget)
+      if (accessToken) {
+        console.log("🔍 Starting background profile analysis...")
+        // Run in background without blocking
+        analyzeUserProfile(accessToken)
+          .then((profileAnalysis) => {
+            if (profileAnalysis) {
+              console.log("\n" + "=".repeat(60))
+              console.log("📊 USER PROFILE ANALYSIS RESULT")
+              console.log("=".repeat(60))
+              console.log(JSON.stringify(profileAnalysis, null, 2))
+              console.log("=".repeat(60) + "\n")
+              
+              // Show the recommended product in a toast (non-blocking)
+              if (profileAnalysis.final_decision) {
+                const decision = profileAnalysis.final_decision
+                toast.success(
+                  `Recommended for you: ${decision.product} by ${decision.company}`,
+                  { duration: 5000 }
+                )
+              }
+            }
+          })
+          .catch((error) => {
+            // Silently handle errors - don't interrupt user experience
+            console.error("Background profile analysis error:", error)
+          })
+      }
     } catch (error) {
       toast.error("An error occurred. Please try again.")
     } finally {
