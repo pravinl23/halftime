@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.v1 import auth, users
+from app.api.v1 import auth, users, onboarding
 
 
 app = FastAPI(
@@ -30,6 +30,12 @@ app.include_router(
     users.router,
     prefix=f"{settings.api_v1_prefix}/users",
     tags=["users"]
+)
+
+app.include_router(
+    onboarding.router,
+    prefix=f"{settings.api_v1_prefix}/onboarding",
+    tags=["onboarding"]
 )
 
 
