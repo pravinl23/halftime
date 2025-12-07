@@ -12,7 +12,6 @@ import os
 import json
 import time
 import requests
-from requests.exceptions import RequestException, ConnectionError, Timeout
 from typing import Optional
 from pathlib import Path
 from dotenv import load_dotenv
@@ -111,34 +110,22 @@ class WaveSpeedClient:
         resolution: str = "720p",
         negative_prompt: str = "",
         enable_prompt_expansion: bool = False,
-        seed: int = -1,
-        poll_interval: float = 5.0,
-        timeout: float = 600.0
+        seed: int = -1
     ) -> dict:
         """
         Generate an AI-edited video using Wan 2.5 video-to-video model.
-        
-        Args:
-            video_url: URL to the source video
-            prompt: Generation prompt
-            duration: Target duration in seconds (3-10, default 10)
-            resolution: Output resolution (480p, 720p, 1080p)
-            negative_prompt: Things to avoid in generation
-            enable_prompt_expansion: Let AI expand the prompt
-            seed: Random seed (-1 for random)
-            poll_interval: Seconds between status checks
-            timeout: Maximum wait time in seconds
-            
-        Returns:
-            Dict with status and output URL
+        Matches WaveSpeed example code exactly.
         """
-        url = f"{self.BASE_URL}/alibaba/wan-2.5/video-extend"
+        # Submit task
+        url = "https://api.wavespeed.ai/api/v3/alibaba/wan-2.5/video-extend"
         
-        # WaveSpeed only accepts duration 3-10, always use 10 for max output
-        duration = 10
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+        }
         
         payload = {
-            "duration": duration,
+            "duration": 10,  # Always use 10 (max allowed)
             "enable_prompt_expansion": enable_prompt_expansion,
             "negative_prompt": negative_prompt,
             "prompt": prompt,
@@ -153,83 +140,48 @@ class WaveSpeedClient:
         
         begin = time.time()
         
-        response = requests.post(url, headers=self.headers, data=json.dumps(payload))
+        response = requests.post(url, headers=headers, data=json.dumps(payload))
         
-        if response.status_code != 200:
-            raise RuntimeError(f"WaveSpeed API error: {response.status_code}, {response.text}")
+        if response.status_code == 200:
+            result = response.json()["data"]
+            request_id = result["id"]
+            print(f"Task submitted successfully. Request ID: {request_id}")
+        else:
+            raise RuntimeError(f"Error: {response.status_code}, {response.text}")
         
-        result = response.json()["data"]
-        request_id = result["id"]
-        print(f"Task submitted. Request ID: {request_id}")
+        # Poll for results - EXACTLY like their example
+        poll_url = f"https://api.wavespeed.ai/api/v3/predictions/{request_id}/result"
+        poll_headers = {"Authorization": f"Bearer {self.api_key}"}
         
-        # Poll for results
-        return self._poll_for_result(request_id, begin, poll_interval, timeout)
-    
-    def _poll_for_result(
-        self,
-        request_id: str,
-        start_time: float,
-        poll_interval: float,
-        timeout: float
-    ) -> dict:
-        """Poll for task completion with robust retry logic."""
-        url = f"{self.BASE_URL}/predictions/{request_id}/result"
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        
-        consecutive_errors = 0
-        max_consecutive_errors = 10  # More retries for video gen
-        
-        print(f"Polling for results (this may take 1-3 minutes)...")
+        print("Polling for results (this may take 1-2 minutes)...")
         
         while True:
-            elapsed = time.time() - start_time
+            response = requests.get(poll_url, headers=poll_headers)
             
-            if elapsed > timeout:
-                raise TimeoutError(f"Video generation timed out after {timeout} seconds")
-            
-            try:
-                response = requests.get(url, headers=headers, timeout=60)
-                
-                if response.status_code != 200:
-                    consecutive_errors += 1
-                    if consecutive_errors >= max_consecutive_errors:
-                        raise RuntimeError(f"Status check failed after {max_consecutive_errors} retries: {response.status_code}, {response.text}")
-                    print(f"Status check error ({consecutive_errors}/{max_consecutive_errors}), retrying in {poll_interval * 2}s...")
-                    time.sleep(poll_interval * 2)
-                    continue
-                
+            if response.status_code == 200:
                 result = response.json()["data"]
                 status = result["status"]
-                consecutive_errors = 0  # Reset on success
                 
                 if status == "completed":
+                    end = time.time()
                     output_url = result["outputs"][0]
-                    print(f"Task completed in {elapsed:.1f} seconds.")
+                    print(f"\nTask completed in {end - begin:.1f} seconds.")
                     print(f"Output URL: {output_url}")
                     return {
                         "status": "completed",
                         "output_url": output_url,
-                        "duration": elapsed,
+                        "duration": end - begin,
                         "request_id": request_id
                     }
-                
                 elif status == "failed":
-                    error = result.get('error', 'Unknown error')
-                    raise RuntimeError(f"Video generation failed: {error}")
-                
+                    raise RuntimeError(f"Task failed: {result.get('error')}")
                 else:
+                    elapsed = time.time() - begin
                     print(f"Status: {status} ({elapsed:.1f}s elapsed)")
-                
-            except (RequestException, ConnectionError, Timeout, Exception) as e:
-                # Catch ALL exceptions during polling - video gen can take minutes
-                consecutive_errors += 1
-                if consecutive_errors >= max_consecutive_errors:
-                    raise RuntimeError(f"Connection failed after {max_consecutive_errors} retries: {e}")
-                print(f"Connection error ({consecutive_errors}/{max_consecutive_errors}): {type(e).__name__}, retrying in {poll_interval * 2}s...")
-                time.sleep(poll_interval * 2)
-                continue
+            else:
+                raise RuntimeError(f"Error: {response.status_code}, {response.text}")
             
-            time.sleep(poll_interval)
+            time.sleep(0.5)
     
     def download_video(self, url: str, output_path: str) -> str:
         """
@@ -259,8 +211,7 @@ def upload_to_temp_hosting(file_path: str) -> str:
     """
     Upload a file to temporary hosting to get a public URL.
     
-    Tries multiple services for reliability.
-    In production, use S3, GCS, or similar.
+    Uses tmpfiles.org which provides direct download links that work with WaveSpeed.
     
     Args:
         file_path: Local file path
@@ -273,65 +224,63 @@ def upload_to_temp_hosting(file_path: str) -> str:
     file_size = os.path.getsize(file_path)
     print(f"File size: {file_size / (1024*1024):.2f} MB")
     
-    # Try multiple hosting services
     errors = []
     
-    # Option 1: catbox.moe (primary - good for video files)
+    # Option 1: tmpfiles.org - direct download links
     try:
-        print("Trying catbox.moe...")
+        print("Trying tmpfiles.org...")
         with open(file_path, 'rb') as f:
             response = requests.post(
-                'https://catbox.moe/user/api.php',
-                data={'reqtype': 'fileupload'},
+                'https://tmpfiles.org/api/v1/upload',
+                files={'file': f},
+                timeout=120
+            )
+        if response.status_code == 200:
+            result = response.json()
+            if result.get('status') == 'success':
+                # Convert view URL to direct download URL
+                url = result['data']['url'].replace('tmpfiles.org/', 'tmpfiles.org/dl/')
+                print(f"Uploaded successfully to tmpfiles.org: {url}")
+                return url
+        errors.append(f"tmpfiles.org: {response.status_code} - {response.text[:100]}")
+    except Exception as e:
+        errors.append(f"tmpfiles.org: {str(e)}")
+    
+    # Option 2: litterbox.catbox.moe (1 hour expiry, more reliable)
+    try:
+        print("Trying litterbox (catbox 1h)...")
+        with open(file_path, 'rb') as f:
+            response = requests.post(
+                'https://litterbox.catbox.moe/resources/internals/api.php',
+                data={'reqtype': 'fileupload', 'time': '1h'},
                 files={'fileToUpload': f},
                 timeout=120
             )
         if response.status_code == 200 and response.text.startswith('http'):
             url = response.text.strip()
-            print(f"Uploaded successfully to catbox.moe: {url}")
+            print(f"Uploaded successfully to litterbox: {url}")
             return url
-        errors.append(f"catbox.moe: {response.status_code} - {response.text[:100]}")
+        errors.append(f"litterbox: {response.status_code} - {response.text[:100]}")
     except Exception as e:
-        errors.append(f"catbox.moe: {str(e)}")
+        errors.append(f"litterbox: {str(e)}")
     
-    # Option 2: 0x0.st (fallback)
+    # Option 3: transfer.sh
     try:
-        print("Trying 0x0.st...")
+        print("Trying transfer.sh...")
+        filename = os.path.basename(file_path)
         with open(file_path, 'rb') as f:
-            response = requests.post(
-                'https://0x0.st',
-                files={'file': f},
+            response = requests.put(
+                f'https://transfer.sh/{filename}',
+                data=f,
                 timeout=120
             )
         if response.status_code == 200:
             url = response.text.strip()
-            print(f"Uploaded successfully to 0x0.st: {url}")
+            print(f"Uploaded successfully to transfer.sh: {url}")
             return url
-        errors.append(f"0x0.st: {response.status_code} - {response.text[:100]}")
+        errors.append(f"transfer.sh: {response.status_code} - {response.text[:100]}")
     except Exception as e:
-        errors.append(f"0x0.st: {str(e)}")
-    
-    # Option 3: file.io (last fallback)
-    try:
-        print("Trying file.io...")
-        with open(file_path, 'rb') as f:
-            response = requests.post(
-                'https://file.io',
-                files={'file': f},
-                timeout=120
-            )
-        if response.status_code == 200:
-            try:
-                result = response.json()
-                if result.get('success'):
-                    url = result['link']
-                    print(f"Uploaded successfully to file.io: {url}")
-                    return url
-            except:
-                pass
-        errors.append(f"file.io: {response.status_code} - {response.text[:100]}")
-    except Exception as e:
-        errors.append(f"file.io: {str(e)}")
+        errors.append(f"transfer.sh: {str(e)}")
     
     # All services failed
     error_msg = "All upload services failed:\n" + "\n".join(f"  - {e}" for e in errors)
