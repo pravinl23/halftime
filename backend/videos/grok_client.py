@@ -176,7 +176,7 @@ Respond with this exact JSON structure:
             if gap.get('context_after'):
                 lines.append(f"   After: {gap['context_after'][:80]}...")
         return '\n'.join(lines)
-    
+
     def analyze_user_demographics(
         self,
         platform_data: dict,
