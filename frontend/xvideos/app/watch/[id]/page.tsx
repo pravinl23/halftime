@@ -13,7 +13,7 @@ export default function WatchPage() {
   const video = getVideoById(videoId)
   const videoRef = useRef<HTMLVideoElement>(null)
   
-  const [showAdPopup, setShowAdPopup] = useState(true) // DEBUG: Force show
+  const [showAdPopup, setShowAdPopup] = useState(false)
   const [adDismissed, setAdDismissed] = useState(false)
 
   // Track video time and show ad popup during ad segment
