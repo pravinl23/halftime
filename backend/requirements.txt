@@ -1,0 +1,15 @@
+# Video Processing
+moviepy>=1.0.3
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# HTTP Requests
+requests>=2.31.0
+
+# API Client (if needed for XAI API)
+openai>=1.0.0  # Compatible with XAI API
+
+# Utilities
+python-dateutil>=2.8.2
+

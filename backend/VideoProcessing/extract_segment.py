@@ -18,7 +18,7 @@ Usage:
 
 import sys
 import os
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 
 
 def parse_time(time_str):
@@ -105,8 +105,9 @@ def extract_segment(input_path, start_time, end_time, output_path=None):
             print(f"Warning: End time ({end_seconds}s) exceeds video duration ({video.duration:.2f}s). Using video end.")
             end_seconds = video.duration
         
-        # Extract segment
-        segment = video.subclip(start_seconds, end_seconds)
+        # Extract segment (moviepy 2.x API)
+        duration = end_seconds - start_seconds
+        segment = video.with_start(start_seconds).with_duration(duration)
         
         print(f"Writing output to: {output_path}")
         segment.write_videofile(
