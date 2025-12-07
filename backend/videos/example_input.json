@@ -1,17 +1,35 @@
 {
   "subtitle_path": "../../data/SouthParkVeal.srt",
   "video_path": "../../data/SouthParkVeal.mp4",
-  "user_data": {
-    "interests": ["comedy", "animation", "satire"],
-    "demographics": {
-      "age_group": "18-34",
-      "location": "US"
-    }
+  "age": 28,
+  "shows": ["South Park", "Rick and Morty", "The Office"],
+  "location": "US",
+  "cookies": {
+    "visited_sites": ["reddit.com", "youtube.com", "github.com"],
+    "interests": ["technology", "comedy"]
   },
+  "x_username": null,
   "product": {
     "company": "Tesla",
     "product": "Model 3",
     "category": "automotive"
   },
+  "available_products": [
+    {
+      "company": "Tesla",
+      "product": "Model 3",
+      "category": "automotive"
+    },
+    {
+      "company": "Apple",
+      "product": "iPhone 15",
+      "category": "electronics"
+    },
+    {
+      "company": "Nike",
+      "product": "Air Max",
+      "category": "footwear"
+    }
+  ],
   "buffer_seconds": 10
 }

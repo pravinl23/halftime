@@ -26,6 +26,8 @@ from pathlib import Path
 
 from ad_placement import AdPlacementAnalyzer, result_to_json, PlacementResult
 from process_video import process_video
+from x_api_client import get_enriched_user_profile, match_user_to_products
+from grok_client import GrokClient
 
 
 def find_ad_placement(
@@ -71,17 +73,60 @@ def find_ad_placement(
     # Validate required fields
     if 'subtitle_path' not in data:
         raise ValueError("Missing required field: subtitle_path")
-    if 'product' not in data:
-        raise ValueError("Missing required field: product")
+    # Product can be optional if available_products is provided
     
     # Extract fields with defaults
     subtitle_path = data['subtitle_path']
     video_path = data.get('video_path')
-    user_data = data.get('user_data', {
-        'interests': [],
-        'demographics': {}
-    })
-    product_info = data['product']
+    product_info = data.get('product')
+    
+    # Get platform data (age, shows, cookies, location, etc.)
+    platform_data = {
+        'age': data.get('age'),
+        'shows': data.get('shows', []),
+        'cookies': data.get('cookies', {}),
+        'location': data.get('location'),
+        'interests': data.get('user_data', {}).get('interests', []),
+        'demographics': data.get('user_data', {}).get('demographics', {})
+    }
+    
+    # Remove None values
+    platform_data = {k: v for k, v in platform_data.items() if v is not None and v != {}}
+    
+    x_username = data.get('x_username')  # Optional X username to fetch
+    
+    # Always use Grok to analyze and enrich user data (NO FALLBACKS)
+    print("Analyzing user data with Grok AI...")
+    grok = GrokClient()
+    enriched_profile = get_enriched_user_profile(
+        platform_data=platform_data,
+        x_username=x_username,
+        grok_client=grok
+    )
+    
+    # Convert to user_data format for ad placement
+    user_data = {
+        'interests': enriched_profile.get('interests', []),
+        'demographics': enriched_profile.get('demographics', {}),
+        'content_preferences': enriched_profile.get('content_preferences', []),
+        'values': enriched_profile.get('values', []),
+        'product_affinities': enriched_profile.get('product_affinities', [])
+    }
+    
+    # If product not specified, use Grok to match user to best product
+    if not product_info:
+        available_products = data.get('available_products', [])
+        if available_products:
+            print("No product specified - matching user to best product with Grok...")
+            matches = match_user_to_products(enriched_profile, available_products, grok)
+            best_match = matches.get('best_match', {})
+            if best_match:
+                product_info = best_match.get('product', {})
+                print(f"  Selected: {product_info.get('product')} by {product_info.get('company')}")
+            else:
+                raise ValueError("No product match found. Please specify a product or provide available_products.")
+        else:
+            raise ValueError("No product specified and no available_products provided.")
     
     # Override buffer_seconds if specified in input
     if 'buffer_seconds' in data:
@@ -274,6 +319,12 @@ def main():
         type=str,
         help="Output file path (JSON result or video if --process)"
     )
+    parser.add_argument(
+        '--x-user',
+        type=str,
+        metavar='USERNAME',
+        help="X/Twitter username to fetch user data from (without @)"
+    )
     
     args = parser.parse_args()
     
@@ -282,15 +333,23 @@ def main():
             result = find_gaps_only(args.gaps_only)
         elif args.inline:
             input_data = json.loads(args.inline)
+            # Inject X user from CLI args
+            if args.x_user:
+                input_data['x_username'] = args.x_user
             if args.process:
                 result = process_ad_placement(input_data, args.buffer, args.speed, args.output, args.ai)
             else:
                 result = find_ad_placement(input_data, args.buffer)
         elif args.input:
+            # Load and potentially modify input data
+            with open(args.input, 'r') as f:
+                input_data = json.load(f)
+            if args.x_user:
+                input_data['x_username'] = args.x_user
             if args.process:
-                result = process_ad_placement(args.input, args.buffer, args.speed, args.output, args.ai)
+                result = process_ad_placement(input_data, args.buffer, args.speed, args.output, args.ai)
             else:
-                result = find_ad_placement(args.input, args.buffer)
+                result = find_ad_placement(input_data, args.buffer)
         else:
             parser.print_help()
             print("\n--- Example Input JSON ---")

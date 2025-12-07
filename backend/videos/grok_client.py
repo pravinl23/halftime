@@ -176,6 +176,204 @@ Respond with this exact JSON structure:
             if gap.get('context_after'):
                 lines.append(f"   After: {gap['context_after'][:80]}...")
         return '\n'.join(lines)
+    
+    def analyze_user_demographics(
+        self,
+        platform_data: dict,
+        x_api_data: Optional[dict] = None
+    ) -> dict:
+        """
+        Analyze user data from platform and X API to infer demographics, interests, and preferences.
+        Uses Grok AI to make intelligent assumptions when data is incomplete.
+        
+        Args:
+            platform_data: Dict with platform data:
+                - age: User age (optional)
+                - shows: List of shows/content they watch (optional)
+                - cookies: Cookie data (browsing history, preferences) (optional)
+                - location: User location (optional)
+                - any other platform-specific data
+            x_api_data: Optional dict with X API data:
+                - interests: List of interests from X
+                - tweets: Sample tweets (optional)
+                - likes: Liked content (optional)
+                - demographics: Any demographic data from X
+        
+        Returns:
+            Dict with enriched user profile:
+            {
+                "interests": [...],
+                "demographics": {
+                    "age_range": "...",
+                    "segment": "...",
+                    "location": "...",
+                    ...
+                },
+                "content_preferences": [...],
+                "values": [...],
+                "product_affinities": [...],
+                "inferred_from": "description of what data was used"
+            }
+        """
+        system_prompt = """You are an expert demographic and psychographic analyst. Your job is to analyze incomplete user data and make intelligent inferences about their demographics, interests, values, and product preferences.
+
+You will receive:
+1. Platform data (age, shows watched, cookies/browsing data, location)
+2. X API data (interests, tweets, likes, demographics)
+
+Your task is to:
+- Infer demographic segment (gen_z, millennial, gen_x, boomer, or psychographic segments like tech_enthusiast, entertainment_fan)
+- Identify interests and preferences even when data is sparse
+- Determine what types of products/services this user would be interested in
+- Infer values and content preferences
+- Make reasonable assumptions based on available data patterns
+
+IMPORTANT: Always respond with valid JSON only. Make inferences even with minimal data - that's your value."""
+        
+        user_prompt = f"""Analyze this user data and provide a comprehensive demographic and psychographic profile.
+
+## Platform Data
+{json.dumps(platform_data, indent=2)}
+
+## X API Data
+{json.dumps(x_api_data or {}, indent=2)}
+
+## Your Task
+Based on the available data (even if sparse), infer:
+1. Demographic segment (age-based or psychographic)
+2. Interests and hobbies
+3. Content preferences (what they like to watch/consume)
+4. Values and priorities
+5. Product affinities (what types of products/services they'd be interested in)
+6. Any other relevant psychographic traits
+
+Make intelligent assumptions. For example:
+- If they watch tech shows and are 25-35, likely tech_enthusiast segment
+- If they watch comedy shows and are 18-25, likely gen_z with entertainment preferences
+- Combine age + shows + interests to infer deeper preferences
+
+Respond with this exact JSON structure:
+{{
+    "interests": ["list", "of", "inferred", "interests"],
+    "demographics": {{
+        "age_range": "inferred age range",
+        "segment": "demographic or psychographic segment name",
+        "location": "inferred or provided location",
+        "confidence": 0.0 to 1.0
+    }},
+    "content_preferences": ["types", "of", "content", "they", "prefer"],
+    "values": ["values", "and", "priorities"],
+    "product_affinities": ["types", "of", "products", "they'd", "be", "interested", "in"],
+    "inferred_from": "Description of what data was available and what assumptions were made"
+}}"""
+        
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+        
+        response = self.chat(messages, temperature=0.5, json_response=True, max_tokens=2048)
+        
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            import re
+            json_match = re.search(r'\{[\s\S]*\}', response)
+            if json_match:
+                return json.loads(json_match.group())
+            raise ValueError(f"Failed to parse Grok response as JSON: {response[:500]}")
+    
+    def match_user_to_products(
+        self,
+        user_profile: dict,
+        available_products: list[dict]
+    ) -> dict:
+        """
+        Match a user profile to the best products/companies for ad placement.
+        Uses Grok to analyze compatibility and relevance.
+        
+        Args:
+            user_profile: Enriched user profile from analyze_user_demographics
+            available_products: List of product dicts with:
+                - company: Company name
+                - product: Product name
+                - category: Product category
+                - description: Optional product description
+        
+        Returns:
+            Dict with matched products:
+            {
+                "matches": [
+                    {
+                        "product": {...},
+                        "relevance_score": 0.0-1.0,
+                        "reason": "Why this product matches",
+                        "ad_style": "suggested ad style (subtle, contextual, etc.)"
+                    }
+                ],
+                "best_match": {...},
+                "analysis": "Overall analysis of matching"
+            }
+        """
+        system_prompt = """You are an expert ad matching specialist. Your job is to match users with products/companies for personalized advertising.
+
+Analyze user profiles and available products to determine:
+- Which products are most relevant to the user
+- Why they match (interests, demographics, values alignment)
+- What style of ad would work best (subtle product placement, direct ad, contextual integration)
+
+IMPORTANT: Always respond with valid JSON only."""
+        
+        user_prompt = f"""Match this user profile to available products for ad placement.
+
+## User Profile
+{json.dumps(user_profile, indent=2)}
+
+## Available Products
+{json.dumps(available_products, indent=2)}
+
+## Your Task
+For each product, determine:
+1. Relevance score (0.0-1.0) - how well it matches the user
+2. Reason for the match
+3. Suggested ad style (subtle, contextual, transitional, direct)
+
+Rank products by relevance and identify the best match.
+
+Respond with this exact JSON structure:
+{{
+    "matches": [
+        {{
+            "product": {{"company": "...", "product": "...", "category": "..."}},
+            "relevance_score": 0.0 to 1.0,
+            "reason": "Why this product matches the user",
+            "ad_style": "suggested ad integration style"
+        }}
+    ],
+    "best_match": {{
+        "product": {{"company": "...", "product": "...", "category": "..."}},
+        "relevance_score": 0.0 to 1.0,
+        "reason": "Why this is the best match",
+        "ad_style": "suggested ad integration style"
+    }},
+    "analysis": "Overall analysis of user-product matching"
+}}"""
+        
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+        
+        response = self.chat(messages, temperature=0.4, json_response=True, max_tokens=2048)
+        
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            import re
+            json_match = re.search(r'\{[\s\S]*\}', response)
+            if json_match:
+                return json.loads(json_match.group())
+            raise ValueError(f"Failed to parse Grok response as JSON: {response[:500]}")
 
 
 if __name__ == "__main__":
