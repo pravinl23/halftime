@@ -52,6 +52,15 @@ export function VideoPlayer({
   const [hoverTime, setHoverTime] = useState<number | null>(null)
   const [hoverPosition, setHoverPosition] = useState(0)
   const [isInAd, setIsInAd] = useState(false)
+  const [isAdLoading, setIsAdLoading] = useState(true)
+
+  // Simulate ad data loading for 8 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAdLoading(false)
+    }, 8000)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Format time as MM:SS or HH:MM:SS
   const formatTime = (seconds: number): string => {
@@ -343,14 +352,14 @@ export function VideoPlayer({
           {/* Invisible expanded click area for easier seeking */}
           <div className="absolute inset-x-4 top-0 bottom-0" />
           
-          {/* Visible progress bar - gray background line */}
+          {/* Visible progress bar - gray background line or flickering loading state */}
           <div 
-            className="relative rounded-full group-hover/progress:h-2.5 transition-all" 
+            className={`relative rounded-full group-hover/progress:h-2.5 transition-all ${isAdLoading ? 'animate-flicker' : ''}`}
             style={{ 
               overflow: 'visible', 
               position: 'relative',
               height: '8px',
-              backgroundColor: '#6B7280', // Solid gray background (gray-500 equivalent)
+              backgroundColor: isAdLoading ? undefined : '#6B7280', // Solid gray background (gray-500 equivalent) if not loading
               width: '100%'
             }}
           >
@@ -364,7 +373,7 @@ export function VideoPlayer({
             />
             
             {/* Ad Marker (Yellow like YouTube) - solid yellow segment on the gray line, clickable */}
-            {ad && effectiveDuration > 0 && adStartPercent >= 0 && adWidthPercent > 0 && (
+            {!isAdLoading && ad && effectiveDuration > 0 && adStartPercent >= 0 && adWidthPercent > 0 && (
               <div 
                 className="absolute h-full rounded-full z-20 cursor-pointer hover:opacity-80 transition-opacity"
                 style={{ 

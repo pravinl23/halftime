@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -151,5 +150,14 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  @keyframes flicker {
+    0%, 100% { background-color: #374151; } /* gray-700 */
+    50% { background-color: #9CA3AF; } /* gray-400 */
+  }
+  
+  .animate-flicker {
+    animation: flicker 1s ease-in-out infinite !important;
   }
 }
