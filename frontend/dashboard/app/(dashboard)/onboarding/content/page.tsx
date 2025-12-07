@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { X, Search, Tv } from "lucide-react"
 
-// Mock show data - this would come from an API in production
 const POPULAR_SHOWS = [
   { id: 1, name: "Breaking Bad", network: "AMC", genre: "Drama" },
   { id: 2, name: "The Office", network: "NBC", genre: "Comedy" },
