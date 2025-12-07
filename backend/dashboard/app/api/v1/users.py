@@ -32,7 +32,7 @@ async def create_organization(
     Returns:
         Created organization data
     """
-    user_id = current_user.id
+    user_id = current_user["id"]
     
     # Check if organization already exists
     existing = supabase.table("organizations").select("*").eq("user_id", user_id).execute()
@@ -60,7 +60,7 @@ async def get_organization(current_user: dict = Depends(get_current_user)):
     Returns:
         Organization data or None
     """
-    user_id = current_user.id
+    user_id = current_user["id"]
     
     result = supabase.table("organizations").select("*").eq("user_id", user_id).execute()
     
@@ -85,7 +85,7 @@ async def update_organization(
     Returns:
         Updated organization data
     """
-    user_id = current_user.id
+    user_id = current_user["id"]
     
     result = supabase.table("organizations").update({
         "company_name": org_data.company_name,

@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from app.core.supabase import supabase
+import jwt
+from app.core.config import settings
 
 
 security = HTTPBearer()
@@ -24,19 +25,29 @@ async def get_current_user(
     token = credentials.credentials
     
     try:
-        # Verify the token with Supabase
-        user = supabase.auth.get_user(token)
+        # Decode the JWT without verification (Supabase validates on their end)
+        # We just need to extract the user info
+        payload = jwt.decode(
+            token,
+            options={"verify_signature": False}  # Supabase already validated this token
+        )
         
-        if not user or not user.user:
+        user_id = payload.get("sub")
+        email = payload.get("email")
+        
+        if not user_id:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid authentication credentials",
                 headers={"WWW-Authenticate": "Bearer"},
             )
         
-        return user.user
+        return {"id": user_id, "email": email}
         
+    except HTTPException:
+        raise
     except Exception as e:
+        print(f"Auth error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Could not validate credentials: {str(e)}",

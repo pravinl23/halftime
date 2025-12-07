@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     # Supabase
     supabase_url: str
     supabase_service_key: str
+    supabase_anon_key: str
     
     # CORS
     frontend_url: str = "http://localhost:3000"

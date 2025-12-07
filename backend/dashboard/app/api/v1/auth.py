@@ -15,7 +15,7 @@ async def get_current_user_profile(current_user: dict = Depends(get_current_user
     Returns:
         UserProfile with user and organization data
     """
-    user_id = current_user.id
+    user_id = current_user["id"]
     
     # Get organization data if exists
     try:
@@ -24,9 +24,9 @@ async def get_current_user_profile(current_user: dict = Depends(get_current_user
         if org_response.data and len(org_response.data) > 0:
             org = org_response.data[0]
             return UserProfile(
-                id=current_user.id,
-                email=current_user.email,
-                created_at=current_user.created_at,
+                id=current_user["id"],
+                email=current_user["email"],
+                created_at=current_user.get("created_at"),
                 organization_id=org.get("id"),
                 company_name=org.get("company_name")
             )
@@ -35,9 +35,9 @@ async def get_current_user_profile(current_user: dict = Depends(get_current_user
         pass
     
     return UserProfile(
-        id=current_user.id,
-        email=current_user.email,
-        created_at=current_user.created_at
+        id=current_user["id"],
+        email=current_user["email"],
+        created_at=current_user.get("created_at")
     )
 
 
@@ -51,7 +51,7 @@ async def verify_token(current_user: dict = Depends(get_current_user)):
     """
     return {
         "valid": True,
-        "user_id": current_user.id,
-        "email": current_user.email
+        "user_id": current_user["id"],
+        "email": current_user["email"]
     }
 
