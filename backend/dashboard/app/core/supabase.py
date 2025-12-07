@@ -12,3 +12,4 @@ def get_supabase_client() -> Client:
 
 # Global Supabase client instance
 supabase: Client = get_supabase_client()
+

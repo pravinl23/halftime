@@ -78,3 +78,4 @@ CREATE POLICY "Users can delete campaigns from their organization"
       SELECT id FROM organizations WHERE user_id = auth.uid()
     )
   );
+

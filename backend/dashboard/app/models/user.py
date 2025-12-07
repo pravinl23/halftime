@@ -17,3 +17,4 @@ class UserProfile(BaseModel):
     created_at: datetime
     organization_id: Optional[str] = None
     company_name: Optional[str] = None
+

@@ -49,3 +49,4 @@ async def health_check():
         "status": "healthy",
         "api_version": "1.0.0"
     }
+
