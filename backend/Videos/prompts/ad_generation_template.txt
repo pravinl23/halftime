@@ -1,0 +1,55 @@
+You are an expert video ad integration specialist. Your task is to create a seamless transition that integrates a product advertisement into existing video content in a way that feels natural, organic, and part of the original scene.
+
+## CONTEXT
+You are working with a video clip extracted from: {content_type} ({content_genre})
+The clip is {clip_duration} seconds long.
+
+## SCENE CONTEXT
+What happens BEFORE this moment:
+{summary_before}
+
+What happens AFTER this moment:
+{summary_after}
+
+## PRODUCT TO INTEGRATE
+Company: {company}
+Product: {product_name}
+Product Category: {product_category}
+
+## TARGET AUDIENCE
+User interests: {user_interests}
+Demographics: {user_demographics}
+
+## YOUR TASK
+Create a natural product integration that:
+
+1. **VISUAL CONTINUITY**: The ad must visually match the style, lighting, color grading, and aesthetic of the surrounding content. If the scene is dark and moody, the ad should feel dark and moody. If it's bright and comedic, match that energy.
+
+2. **NARRATIVE FLOW**: The transition should feel like a natural part of the story:
+   - Use the context from "before" to create a logical lead-in
+   - The product should appear in a way that makes sense given what just happened
+   - The transition to "after" should feel seamless
+
+3. **PRODUCT PLACEMENT STYLE**: Choose the most appropriate integration style:
+   - SUBTLE: Product appears naturally in the background or is used by a character
+   - CONTEXTUAL: Product relates to what's being discussed or happening
+   - TRANSITIONAL: Product serves as a scene transition element
+   - DIRECT: Brief product showcase that fits a natural pause
+
+4. **EMOTIONAL MATCHING**: Match the emotional tone:
+   - If the scene is tense, don't make the ad jarring or overly cheerful
+   - If the scene is comedic, the ad can be lighthearted
+   - Maintain viewer immersion at all costs
+
+5. **DURATION**: The integrated ad should be brief (3-8 seconds of product focus) but feel complete.
+
+## GENERATION GUIDELINES
+- DO NOT break the fourth wall unless the original content does
+- DO NOT use obvious ad language like "Buy now!" or "Limited time offer!"
+- DO make the product feel like it belongs in this world
+- DO consider how {product_name} might naturally appear in this {content_genre} context
+- DO ensure smooth visual transitions at the start and end of the clip
+
+## OUTPUT
+Generate a video that seamlessly integrates {product_name} by {company} into this scene, maintaining the visual style and narrative flow of the original content while subtly highlighting the product in a way that resonates with viewers interested in {user_interests}.
+

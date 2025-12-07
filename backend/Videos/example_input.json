@@ -1,0 +1,17 @@
+{
+  "subtitle_path": "../../data/SouthParkVeal.srt",
+  "video_path": "../../data/SouthParkVeal.mp4",
+  "user_data": {
+    "interests": ["comedy", "animation", "satire"],
+    "demographics": {
+      "age_group": "18-34",
+      "location": "US"
+    }
+  },
+  "product": {
+    "company": "Tesla",
+    "product": "Model 3",
+    "category": "automotive"
+  },
+  "buffer_seconds": 10
+}
