@@ -51,3 +51,5 @@ Thumbs.db
 
 # Node
 node_modules/
+data/*.mp4
+data/*.srt
