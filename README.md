@@ -1,8 +1,6 @@
-# Halftime
+# Halftime | **As Seen on CBS | [Winner @ xAI Hackathon](https://x.com/xai/status/1997875236415676619?s=20)**
 
 https://github.com/user-attachments/assets/a90a1640-ae86-4103-884b-4dfd0f435adb
-
-**As Seen on CBS | [Winner @ xAI Hackathon](https://x.com/xai/status/1997875236415676619?s=20)**
 
 AI-powered video advertising that actually works. Instead of interrupting viewers with pre-roll ads, we use AI to find natural moments in videos and seamlessly insert personalized ads that feel like part of the show.
 
